@@ -3,11 +3,17 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { getSettings } from "src/settings/settings";
 import "../styles/TranslatePanel.scss";
-import { getBackgroundColor, getCandidateFontColor, getResultFontColor } from "../../settings/defaultColors";
+import {
+  getBackgroundColor,
+  getCandidateFontColor,
+  getResultFontColor,
+} from "../../settings/defaultColors";
 
-const splitLine = text => {
+const splitLine = (text) => {
   const regex = /(\n)/g;
-  return text.split(regex).map((line, i) => (line.match(regex) ? <br key={i} /> : line));
+  return text
+    .split(regex)
+    .map((line, i) => (line.match(regex) ? <br key={i} /> : line));
 };
 
 export default class TranslatePanel extends Component {
@@ -18,7 +24,7 @@ export default class TranslatePanel extends Component {
       panelWidth: 0,
       panelHeight: 0,
       shouldResize: true,
-      isOverflow: false
+      isOverflow: false,
     };
 
     this.dragOffsets = { x: 0, y: 0 };
@@ -37,19 +43,21 @@ export default class TranslatePanel extends Component {
     document.removeEventListener("drop", this.handleDrop);
   };
 
-  handleDragStart = e => {
+  handleDragStart = (e) => {
     if (e.target.className !== "simple-translate-move") return;
     this.isDragging = true;
 
-    const rect = document.querySelector(".simple-translate-panel").getBoundingClientRect();
+    const rect = document
+      .querySelector(".simple-translate-panel")
+      .getBoundingClientRect();
     this.dragOffsets = {
       x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      y: e.clientY - rect.top,
     };
     e.dataTransfer.setData("text/plain", "");
   };
 
-  handleDragOver = e => {
+  handleDragOver = (e) => {
     if (!this.isDragging) return;
     e.preventDefault();
     const panel = document.querySelector(".simple-translate-panel");
@@ -57,7 +65,7 @@ export default class TranslatePanel extends Component {
     panel.style.left = `${e.clientX - this.dragOffsets.x}px`;
   };
 
-  handleDrop = e => {
+  handleDrop = (e) => {
     if (!this.isDragging) return;
     e.preventDefault();
     this.isDragging = false;
@@ -133,39 +141,49 @@ export default class TranslatePanel extends Component {
   calcSize = () => {
     const maxWidth = parseInt(getSettings("width"));
     const wrapper = ReactDOM.findDOMNode(this.refs.wrapper);
-    const wrapperWidth = wrapper.clientWidth < maxWidth ? wrapper.clientWidth + 1 : maxWidth;
+    const wrapperWidth =
+      wrapper.clientWidth < maxWidth ? wrapper.clientWidth + 1 : maxWidth;
     const wrapperHeight = wrapper.clientHeight;
     return { panelWidth: wrapperWidth, panelHeight: wrapperHeight };
   };
 
-  componentWillReceiveProps = nextProps => {
+  componentDidUpdate(prevProps) {
     const isChangedContents =
-      this.props.resultText !== nextProps.resultText ||
-      this.props.candidateText !== nextProps.candidateText ||
-      this.props.position !== nextProps.position;
+      prevProps.resultText !== this.props.resultText ||
+      prevProps.candidateText !== this.props.candidateText ||
+      prevProps.position !== this.props.position;
 
-    if (isChangedContents && nextProps.shouldShow) this.setState({ shouldResize: true });
-  };
-
-  componentDidUpdate = () => {
+    if (isChangedContents && this.props.shouldShow) {
+      this.setState({ shouldResize: true });
+    }
     if (!this.state.shouldResize || !this.props.shouldShow) return;
     const panelPosition = this.calcPosition();
     const { panelWidth, panelHeight } = this.calcSize();
-    const isOverflow = panelHeight == parseInt(getSettings("height"));
+    const isOverflow = panelHeight === parseInt(getSettings("height"));
 
     this.setState({
       shouldResize: false,
       panelPosition: panelPosition,
       panelWidth: panelWidth,
       panelHeight: panelHeight,
-      isOverflow: isOverflow
+      isOverflow: isOverflow,
     });
-  };
-
+  }
   render = () => {
-    const { shouldShow, selectedText, currentLang, resultText, candidateText, isError, errorMessage } = this.props;
+    const {
+      shouldShow,
+      selectedText,
+      currentLang,
+      resultText,
+      candidateText,
+      isError,
+      errorMessage,
+    } = this.props;
     const { width, height } = this.state.shouldResize
-      ? { width: parseInt(getSettings("width")), height: parseInt(getSettings("height")) }
+      ? {
+          width: parseInt(getSettings("width")),
+          height: parseInt(getSettings("height")),
+        }
       : { width: this.state.panelWidth, height: this.state.panelHeight };
 
     const panelStyles = {
@@ -176,13 +194,13 @@ export default class TranslatePanel extends Component {
       fontSize: parseInt(getSettings("fontSize")),
     };
 
-    const backgroundColor = getBackgroundColor()
+    const backgroundColor = getBackgroundColor();
     if (backgroundColor) {
-      panelStyles.backgroundColor = backgroundColor.backgroundColor
+      panelStyles.backgroundColor = backgroundColor.backgroundColor;
     }
 
     const wrapperStyles = {
-      overflow: this.state.isOverflow ? "auto" : "hidden"
+      overflow: this.state.isOverflow ? "auto" : "hidden",
     };
 
     const translationApi = getSettings("translationApi");
@@ -193,27 +211,50 @@ export default class TranslatePanel extends Component {
         ref="panel"
         style={panelStyles}
       >
-        <div className="simple-translate-result-wrapper" ref="wrapper" style={wrapperStyles}>
-          <div className="simple-translate-move" draggable="true" ref="move"></div>
+        <div
+          className="simple-translate-result-wrapper"
+          ref="wrapper"
+          style={wrapperStyles}
+        >
+          <div
+            className="simple-translate-move"
+            draggable="true"
+            ref="move"
+          ></div>
           <div className="simple-translate-result-contents">
-            <p className="simple-translate-result" style={getResultFontColor()} dir="auto">
+            <p
+              className="simple-translate-result"
+              style={getResultFontColor()}
+              dir="auto"
+            >
               {splitLine(resultText)}
             </p>
-            <p className="simple-translate-candidate" style={getCandidateFontColor()} dir="auto">
+            <p
+              className="simple-translate-candidate"
+              style={getCandidateFontColor()}
+              dir="auto"
+            >
               {splitLine(candidateText)}
             </p>
             {isError && (
               <p className="simple-translate-error">
                 {errorMessage}
                 <br />
-                <a href={translationApi === "google" ?
-                  `https://translate.google.com/?sl=auto&tl=${currentLang}&text=${encodeURIComponent(selectedText)}` :
-                  `https://www.deepl.com/translator#auto/${currentLang}/${encodeURIComponent(selectedText)}`
-                }
-                  target="_blank">
-                  {translationApi === "google" ?
-                    browser.i18n.getMessage("openInGoogleLabel") :
-                    browser.i18n.getMessage("openInDeeplLabel")}
+                <a
+                  href={
+                    translationApi === "google"
+                      ? `https://translate.google.com/?sl=auto&tl=${currentLang}&text=${encodeURIComponent(
+                          selectedText
+                        )}`
+                      : `https://www.deepl.com/translator#auto/${currentLang}/${encodeURIComponent(
+                          selectedText
+                        )}`
+                  }
+                  target="_blank"
+                >
+                  {translationApi === "google"
+                    ? browser.i18n.getMessage("openInGoogleLabel")
+                    : browser.i18n.getMessage("openInDeeplLabel")}
                 </a>
               </p>
             )}
