@@ -102,10 +102,10 @@
     "message": "Show multiple translation candidates when a single word is translated."
   },
   "ifautoPlayListenLabel": {
-    "message": "Auto play phoneme."
+    "message": "Auto play pronunciation"
   },
   "ifautoPlayListenCaptionLabel": {
-    "message": "When translating any word, automatic play phoneme sound."
+    "message": "Automatically play the phonetic pronunciation during translations."
   },
   "whenSelectTextLabel": {
     "message": "Behavior when selecting text"
