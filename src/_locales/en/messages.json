@@ -101,6 +101,12 @@
   "ifShowCandidateCaptionLabel": {
     "message": "Show multiple translation candidates when a single word is translated."
   },
+  "ifautoPlayListenLabel": {
+    "message": "Auto play phoneme."
+  },
+  "ifautoPlayListenCaptionLabel": {
+    "message": "When translating any word, automatic play phoneme sound."
+  },
   "whenSelectTextLabel": {
     "message": "Behavior when selecting text"
   },

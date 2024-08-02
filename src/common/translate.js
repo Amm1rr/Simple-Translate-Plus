@@ -85,8 +85,11 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang) => {
       .join("");
   }
 
-  console.log(resultData.sourceLanguage + " : " + word);
-  playAudioInBackground(word, resultData.sourceLanguage);
+  const autoPlay = getSettings("ifautoPlayListen");
+  if (autoPlay) {
+    log.log(logDir, "autoPlayListen()", word);
+    playAudioInBackground(word, resultData.sourceLanguage);
+  }
 
   log.log(logDir, "sendRequest()", resultData);
 
