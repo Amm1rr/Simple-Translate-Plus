@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Simple Translate"
+    "message": "Simple Translate Plus"
   },
   "extDescription": {
     "message": "Webページ上で選択・入力したテキストを瞬時に翻訳します。Google翻訳とDeepL APIに対応しています。"

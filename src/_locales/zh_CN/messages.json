@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Simple Translate"
+    "message": "Simple Translate Plus"
   },
   "extDescription": {
     "message": "在网页上快速翻译选定或输入的文本。支持 Google 翻译和DeepL API。"

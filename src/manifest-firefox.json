@@ -6,7 +6,7 @@
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
-      "id": "simple-translate@sienori"
+      "id": "simple-translate-plus@amm1rr"
     }
   },
   "permissions": ["storage", "contextMenus"],
