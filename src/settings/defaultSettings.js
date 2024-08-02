@@ -8,14 +8,14 @@ import {
   CANDIDATE_FONT_COLOR_LIGHT,
   CANDIDATE_FONT_COLOR_DARK,
   BG_COLOR_LIGHT,
-  BG_COLOR_DARK
+  BG_COLOR_DARK,
 } from "./defaultColors";
 
 const getDefaultLangs = () => {
   const uiLang = browser.i18n.getUILanguage();
   const langOptions = generateLangOptions("google");
 
-  const shouldUseUiLang = langOptions.some(lang => lang.value == uiLang);
+  const shouldUseUiLang = langOptions.some((lang) => lang.value == uiLang);
   const targetLang = shouldUseUiLang ? uiLang : "en";
   const secondTargetLang = targetLang === "en" ? "ja" : "en";
 
@@ -25,26 +25,37 @@ const getDefaultLangs = () => {
 const updateLangsWhenChangeTranslationApi = () => {
   const translationApi = getSettings("translationApi");
   const targetLang = getSettings("targetLang");
-  const secondTargetLang = getSettings("secondTargetLang");;
-  const currentLangs = generateLangOptions(translationApi).map(option => option.value);
+  const secondTargetLang = getSettings("secondTargetLang");
+  const currentLangs = generateLangOptions(translationApi).map(
+    (option) => option.value
+  );
 
-  const mappingLang = lang => {
+  const mappingLang = (lang) => {
     switch (lang) {
-      case "en": return "en-US";
+      case "en":
+        return "en-US";
       case "en-US":
-      case "en-GB": return "en";
-      case "zh": return "zh-CN";
+      case "en-GB":
+        return "en";
+      case "zh":
+        return "zh-CN";
       case "zh-CN":
-      case "zh-TW": return "zh";
-      case "pt": return "pt-PT";
+      case "zh-TW":
+        return "zh";
+      case "pt":
+        return "pt-PT";
       case "pt-PT":
-      case "pt-BR": return "pt";
-      default: return currentLangs[0];
+      case "pt-BR":
+        return "pt";
+      default:
+        return currentLangs[0];
     }
   };
 
-  if (!currentLangs.includes(targetLang)) setSettings("targetLang", mappingLang(targetLang));
-  if (!currentLangs.includes(secondTargetLang)) setSettings("secondTargetLang", mappingLang(secondTargetLang));
+  if (!currentLangs.includes(targetLang))
+    setSettings("targetLang", mappingLang(targetLang));
+  if (!currentLangs.includes(secondTargetLang))
+    setSettings("secondTargetLang", mappingLang(secondTargetLang));
 };
 
 const defaultLangs = getDefaultLangs();
@@ -68,25 +79,27 @@ export default [
             captions: ["googleApiCaptionLabel"],
             type: "radio",
             value: "google",
-            handleChange: () => updateLangsWhenChangeTranslationApi()
+            handleChange: () => updateLangsWhenChangeTranslationApi(),
           },
           {
             id: "translationApi",
             title: "deeplApiLabel",
             captions: ["deeplApiCaptionLabel"],
-            extraCaption:
-              React.createElement("p",
-                { className: "caption" },
-                React.createElement("a",
-                  {
-                    href: "https://github.com/sienori/simple-translate/wiki/How-to-register-DeepL-API",
-                    target: "_blank"
-                  },
-                  browser.i18n.getMessage("howToUseDeeplLabel"))
-              ),
+            extraCaption: React.createElement(
+              "p",
+              { className: "caption" },
+              React.createElement(
+                "a",
+                {
+                  href: "https://github.com/sienori/simple-translate/wiki/How-to-register-DeepL-API",
+                  target: "_blank",
+                },
+                browser.i18n.getMessage("howToUseDeeplLabel")
+              )
+            ),
             type: "radio",
             value: "deepl",
-            handleChange: () => updateLangsWhenChangeTranslationApi()
+            handleChange: () => updateLangsWhenChangeTranslationApi(),
           },
           {
             id: "deeplPlan",
@@ -94,18 +107,18 @@ export default [
             captions: ["deeplPlanCaptionLabel"],
             type: "select",
             default: "deeplFree",
-            shouldShow: () => (getSettings("translationApi") === "deepl"),
+            shouldShow: () => getSettings("translationApi") === "deepl",
             hr: true,
             options: [
               {
                 name: "deeplFreeLabel",
-                value: "deeplFree"
+                value: "deeplFree",
               },
               {
                 name: "deeplProLabel",
-                value: "deeplPro"
+                value: "deeplPro",
               },
-            ]
+            ],
           },
           {
             id: "deeplAuthKey",
@@ -114,9 +127,9 @@ export default [
             type: "text",
             default: "",
             placeholder: "00000000-0000-0000-0000-00000000000000:fx",
-            shouldShow: () => (getSettings("translationApi") === "deepl"),
-          }
-        ]
+            shouldShow: () => getSettings("translationApi") === "deepl",
+          },
+        ],
       },
       {
         id: "targetLang",
@@ -125,7 +138,7 @@ export default [
         type: "select",
         default: defaultLangs.targetLang,
         options: () => generateLangOptions(getSettings("translationApi")),
-        useRawOptionName: true
+        useRawOptionName: true,
       },
       {
         id: "secondTargetLang",
@@ -134,7 +147,7 @@ export default [
         type: "select",
         default: defaultLangs.secondTargetLang,
         options: () => generateLangOptions(getSettings("translationApi")),
-        useRawOptionName: true
+        useRawOptionName: true,
       },
       {
         id: "ifShowCandidate",
@@ -142,9 +155,17 @@ export default [
         captions: ["ifShowCandidateCaptionLabel"],
         type: "checkbox",
         default: true,
-        shouldShow: () => (getSettings("translationApi") === "google")
-      }
-    ]
+        shouldShow: () => getSettings("translationApi") === "google",
+      },
+      {
+        id: "ifautoPlayListen",
+        title: "ifautoPlayListenLabel",
+        captions: ["ifautoPlayListenCaptionLabel"],
+        type: "checkbox",
+        default: false,
+        shouldShow: () => getSettings("translationApi") === "google",
+      },
+    ],
   },
   {
     category: "webPageLabel",
@@ -161,21 +182,21 @@ export default [
             title: "ifShowButtonLabel",
             captions: ["ifShowButtonCaptionLabel"],
             type: "radio",
-            value: "showButton"
+            value: "showButton",
           },
           {
             id: "whenSelectText",
             title: "ifAutoTranslateLabel",
             captions: ["ifAutoTranslateCaptionLabel"],
             type: "radio",
-            value: "showPanel"
+            value: "showPanel",
           },
           {
             id: "whenSelectText",
             title: "dontShowButtonLabel",
             captions: ["dontShowButtonCaptionLabel"],
             type: "radio",
-            value: "dontShowButton"
+            value: "dontShowButton",
           },
           {
             id: "ifCheckLang",
@@ -183,9 +204,9 @@ export default [
             captions: ["ifCheckLangCaptionLabel"],
             type: "checkbox",
             default: true,
-            hr: true
-          }
-        ]
+            hr: true,
+          },
+        ],
       },
       {
         id: "ifOnlyTranslateWhenModifierKeyPressed",
@@ -203,29 +224,30 @@ export default [
             options: [
               {
                 name: "shiftLabel",
-                value: "shift"
+                value: "shift",
               },
               {
                 name: "ctrlLabel",
-                value: "ctrl"
+                value: "ctrl",
               },
               {
                 name: "altLabel",
-                value: "alt"
+                value: "alt",
               },
               {
                 name: "cmdLabel",
-                value: "cmd"
-              }]
-          }
-        ]
+                value: "cmd",
+              },
+            ],
+          },
+        ],
       },
       {
         id: "ifChangeSecondLangOnPage",
         title: "ifChangeSecondLangLabel",
         captions: ["ifChangeSecondLangOnPageCaptionLabel"],
         type: "checkbox",
-        default: false
+        default: false,
       },
       {
         title: "disableTranslationLabel",
@@ -237,14 +259,14 @@ export default [
             title: "isDisabledInTextFieldsLabel",
             captions: ["isDisabledInTextFieldsCaptionLabel"],
             type: "checkbox",
-            default: false
+            default: false,
           },
           {
             id: "isDisabledInCodeElement",
             title: "isDisabledInCodeElementLabel",
             captions: ["isDisabledInCodeElementCaptionLabel"],
             type: "checkbox",
-            default: false
+            default: false,
           },
           {
             id: "ignoredDocumentLang",
@@ -252,7 +274,7 @@ export default [
             captions: ["ignoredDocumentLangCaptionLabel"],
             type: "text",
             default: "",
-            placeholder: "en, ru, zh"
+            placeholder: "en, ru, zh",
           },
           {
             id: "disableUrlList",
@@ -260,11 +282,11 @@ export default [
             captions: ["disableUrlListCaptionLabel"],
             type: "textarea",
             default: "",
-            placeholder: "https://example.com/*\nhttps://example.net/*"
-          }
-        ]
-      }
-    ]
+            placeholder: "https://example.com/*\nhttps://example.net/*",
+          },
+        ],
+      },
+    ],
   },
   {
     category: "toolbarLabel",
@@ -276,16 +298,16 @@ export default [
         type: "number",
         min: 0,
         placeholder: 500,
-        default: 500
+        default: 500,
       },
       {
         id: "ifChangeSecondLang",
         title: "ifChangeSecondLangLabel",
         captions: ["ifChangeSecondLangCaptionLabel"],
         type: "checkbox",
-        default: true
-      }
-    ]
+        default: true,
+      },
+    ],
   },
   {
     category: "menuLabel",
@@ -295,9 +317,9 @@ export default [
         title: "ifShowMenuLabel",
         captions: ["ifShowMenuCaptionLabel"],
         type: "checkbox",
-        default: true
-      }
-    ]
+        default: true,
+      },
+    ],
   },
   {
     category: "pageTranslationLabel",
@@ -311,15 +333,15 @@ export default [
         options: [
           {
             name: "newTabLabel",
-            value: "newTab"
+            value: "newTab",
           },
           {
             name: "currentTabLabel",
-            value: "currentTab"
+            value: "currentTab",
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
     category: "styleLabel",
@@ -329,21 +351,21 @@ export default [
         title: "themeLabel",
         captions: ["themeCaptionLabel"],
         type: "select",
-        default: 'system',
+        default: "system",
         options: [
           {
             name: "lightLabel",
-            value: "light"
+            value: "light",
           },
           {
             name: "darkLabel",
-            value: "dark"
+            value: "dark",
           },
           {
             name: "systemLabel",
-            value: "system"
-          }
-        ]
+            value: "system",
+          },
+        ],
       },
       {
         title: "buttonStyleLabel",
@@ -357,7 +379,7 @@ export default [
             type: "number",
             min: 1,
             placeholder: 22,
-            default: 22
+            default: 22,
           },
           {
             id: "buttonDirection",
@@ -368,37 +390,37 @@ export default [
             options: [
               {
                 name: "topLabel",
-                value: "top"
+                value: "top",
               },
               {
                 name: "bottomLabel",
-                value: "bottom"
+                value: "bottom",
               },
               {
                 name: "rightLabel",
-                value: "right"
+                value: "right",
               },
               {
                 name: "leftLabel",
-                value: "left"
+                value: "left",
               },
               {
                 name: "topRightLabel",
-                value: "topRight"
+                value: "topRight",
               },
               {
                 name: "topLeftLabel",
-                value: "topLeft"
+                value: "topLeft",
               },
               {
                 name: "bottomRightLabel",
-                value: "bottomRight"
+                value: "bottomRight",
               },
               {
                 name: "bottomLeftLabel",
-                value: "bottomLeft"
-              }
-            ]
+                value: "bottomLeft",
+              },
+            ],
           },
           {
             id: "buttonOffset",
@@ -406,9 +428,9 @@ export default [
             captions: [],
             type: "number",
             default: 10,
-            placeholder: 10
-          }
-        ]
+            placeholder: 10,
+          },
+        ],
       },
       {
         title: "panelStyleLabel",
@@ -422,7 +444,7 @@ export default [
             type: "number",
             min: 1,
             placeholder: 300,
-            default: 300
+            default: 300,
           },
           {
             id: "height",
@@ -431,7 +453,7 @@ export default [
             type: "number",
             min: 1,
             placeholder: 200,
-            default: 200
+            default: 200,
           },
           {
             id: "fontSize",
@@ -440,7 +462,7 @@ export default [
             type: "number",
             min: 1,
             placeholder: 13,
-            default: 13
+            default: 13,
           },
           {
             id: "panelReferencePoint",
@@ -451,17 +473,17 @@ export default [
             options: [
               {
                 name: "topSelectedTextLabel",
-                value: "topSelectedText"
+                value: "topSelectedText",
               },
               {
                 name: "bottomSelectedTextLabel",
-                value: "bottomSelectedText"
+                value: "bottomSelectedText",
               },
               {
                 name: "clickedPointLabel",
-                value: "clickedPoint"
-              }
-            ]
+                value: "clickedPoint",
+              },
+            ],
           },
           {
             id: "panelDirection",
@@ -472,37 +494,37 @@ export default [
             options: [
               {
                 name: "topLabel",
-                value: "top"
+                value: "top",
               },
               {
                 name: "bottomLabel",
-                value: "bottom"
+                value: "bottom",
               },
               {
                 name: "rightLabel",
-                value: "right"
+                value: "right",
               },
               {
                 name: "leftLabel",
-                value: "left"
+                value: "left",
               },
               {
                 name: "topRightLabel",
-                value: "topRight"
+                value: "topRight",
               },
               {
                 name: "topLeftLabel",
-                value: "topLeft"
+                value: "topLeft",
               },
               {
                 name: "bottomRightLabel",
-                value: "bottomRight"
+                value: "bottomRight",
               },
               {
                 name: "bottomLeftLabel",
-                value: "bottomLeft"
-              }
-            ]
+                value: "bottomLeft",
+              },
+            ],
           },
           {
             id: "panelOffset",
@@ -510,14 +532,14 @@ export default [
             captions: [],
             type: "number",
             default: 10,
-            placeholder: 10
+            placeholder: 10,
           },
           {
             id: "isOverrideColors",
             title: "isOverrideColorsLabel",
             captions: [],
             type: "checkbox",
-            default: false
+            default: false,
           },
           {
             id: "resultFontColor",
@@ -546,9 +568,9 @@ export default [
             type: "color",
             default: getTheme() === "light" ? BG_COLOR_LIGHT : BG_COLOR_DARK,
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
     category: "otherLabel",
@@ -558,15 +580,15 @@ export default [
         title: "isShowOptionsPageWhenUpdatedLabel",
         captions: ["isShowOptionsPageWhenUpdatedCaptionLabel"],
         type: "checkbox",
-        default: true
+        default: true,
       },
       {
         id: "isDebugMode",
         title: "isDebugModeLabel",
         captions: ["isDebugModeCaptionLabel"],
         type: "checkbox",
-        default: false
-      }
-    ]
-  }
+        default: false,
+      },
+    ],
+  },
 ];
