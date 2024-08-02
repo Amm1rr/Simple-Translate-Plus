@@ -15,8 +15,10 @@ export default class CopyButton extends Component {
     this.setState({ isCopied: true });
   };
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.text !== nextProps.text) this.setState({ isCopied: false });
+  componentDidUpdate(prevProps) {
+    if (this.props.text !== prevProps.text) {
+      this.setState({ isCopied: false });
+    }
   }
 
   render() {
@@ -26,10 +28,15 @@ export default class CopyButton extends Component {
     return (
       <div className="copy">
         {this.state.isCopied && (
-          <span className="copiedText">{browser.i18n.getMessage("copiedLabel")}</span>
+          <span className="copiedText">
+            {browser.i18n.getMessage("copiedLabel")}
+          </span>
         )}
         <CopyToClipboard text={text} onCopy={this.handleCopy}>
-          <button className="copyButton" title={browser.i18n.getMessage("copyLabel")}>
+          <button
+            className="copyButton"
+            title={browser.i18n.getMessage("copyLabel")}
+          >
             <CopyIcon />
           </button>
         </CopyToClipboard>
