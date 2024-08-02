@@ -7,19 +7,20 @@ import "../styles/TranslateContainer.scss";
 
 const translateText = async (text, targetLang = getSettings("targetLang")) => {
   const result = await browser.runtime.sendMessage({
-    message: 'translate',
+    message: "translate",
     text: text,
-    sourceLang: 'auto',
+    sourceLang: "auto",
     targetLang: targetLang,
   });
   return result;
 };
 
-const matchesTargetLang = async selectedText => {
+const matchesTargetLang = async (selectedText) => {
   const targetLang = getSettings("targetLang");
   //detectLanguageで判定
   const langInfo = await browser.i18n.detectLanguage(selectedText);
-  const matchsLangsByDetect = langInfo.isReliable && langInfo.languages[0].language === targetLang;
+  const matchsLangsByDetect =
+    langInfo.isReliable && langInfo.languages[0].language === targetLang;
   if (matchsLangsByDetect) return true;
 
   //先頭100字を翻訳にかけて判定
@@ -30,7 +31,8 @@ const matchesTargetLang = async selectedText => {
   const isNotText = result.percentage === 0;
   if (isNotText) return true;
 
-  const matchsLangs = targetLang.split("-")[0] === result.sourceLanguage.split("-")[0]; // split("-")[0] : deepLでenとen-USを区別しないために必要
+  const matchsLangs =
+    targetLang.split("-")[0] === result.sourceLanguage.split("-")[0]; // split("-")[0] : deepLでenとen-USを区別しないために必要
   return matchsLangs;
 };
 
@@ -46,7 +48,7 @@ export default class TranslateContainer extends Component {
       resultText: "",
       candidateText: "",
       isError: false,
-      errorMessage: ""
+      errorMessage: "",
     };
     this.selectedText = props.selectedText;
     this.selectedPosition = props.selectedPosition;
@@ -57,9 +59,10 @@ export default class TranslateContainer extends Component {
     else this.handleTextSelect(this.props.clickedPosition);
   };
 
-  handleTextSelect = async clickedPosition => {
+  handleTextSelect = async (clickedPosition) => {
     const onSelectBehavior = getSettings("whenSelectText");
-    if (onSelectBehavior === "dontShowButton") return this.props.removeContainer();
+    if (onSelectBehavior === "dontShowButton")
+      return this.props.removeContainer();
 
     if (getSettings("ifCheckLang")) {
       const matchesLang = await matchesTargetLang(this.selectedText);
@@ -70,7 +73,7 @@ export default class TranslateContainer extends Component {
     else if (onSelectBehavior === "showPanel") this.showPanel(clickedPosition);
   };
 
-  showButton = clickedPosition => {
+  showButton = (clickedPosition) => {
     this.setState({ shouldShowButton: true, buttonPosition: clickedPosition });
   };
 
@@ -78,24 +81,31 @@ export default class TranslateContainer extends Component {
     this.setState({ shouldShowButton: false });
   };
 
-  handleButtonClick = e => {
+  handleButtonClick = (e) => {
     const clickedPosition = { x: e.clientX, y: e.clientY };
     this.showPanel(clickedPosition);
     this.hideButton();
   };
 
   showPanel = async (clickedPosition = null) => {
+    console.log("showPanel");
     const panelReferencePoint = getSettings("panelReferencePoint");
-    const useClickedPosition = panelReferencePoint === "clickedPoint" && clickedPosition !== null;
-    const panelPosition = useClickedPosition ? clickedPosition : this.selectedPosition;
+    const useClickedPosition =
+      panelReferencePoint === "clickedPoint" && clickedPosition !== null;
+    const panelPosition = useClickedPosition
+      ? clickedPosition
+      : this.selectedPosition;
 
     let result = await translateText(this.selectedText);
     const targetLang = getSettings("targetLang");
     const secondLang = getSettings("secondTargetLang");
     const shouldSwitchSecondLang =
       getSettings("ifChangeSecondLangOnPage") &&
-      result.sourceLanguage.split("-")[0] === targetLang.split("-")[0] && result.percentage > 0 && targetLang !== secondLang;
-    if (shouldSwitchSecondLang) result = await translateText(this.selectedText, secondLang);
+      result.sourceLanguage.split("-")[0] === targetLang.split("-")[0] &&
+      result.percentage > 0 &&
+      targetLang !== secondLang;
+    if (shouldSwitchSecondLang)
+      result = await translateText(this.selectedText, secondLang);
 
     this.setState({
       shouldShowPanel: true,
@@ -104,7 +114,7 @@ export default class TranslateContainer extends Component {
       candidateText: getSettings("ifShowCandidate") ? result.candidateText : "",
       isError: result.isError,
       errorMessage: result.errorMessage,
-      currentLang: shouldSwitchSecondLang ? secondLang : targetLang
+      currentLang: shouldSwitchSecondLang ? secondLang : targetLang,
     });
   };
 
