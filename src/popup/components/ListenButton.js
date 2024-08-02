@@ -22,8 +22,6 @@ const playAudio = async (text, lang) => {
 };
 
 export const playAudioInBackground = async (text, lang) => {
-  console.log("############ [Play Lang]: " + lang);
-
   const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
     text
   )}&tl=${lang}`;
