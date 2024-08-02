@@ -15,15 +15,36 @@ const playAudio = async (text, lang) => {
   audio.load();
 
   await browser.permissions.request({
-    origins: [
-      "https://translate.google.com/*",
-    ]
+    origins: ["https://translate.google.com/*"],
   });
 
-  await audio.play().catch(e => log.error(logDir, "playAudio()", e, url));
+  await audio.play().catch((e) => log.error(logDir, "playAudio()", e, url));
 };
 
-export default props => {
+export const playAudioInBackground = async (text, lang) => {
+  console.log("############ [Play Lang]: " + lang);
+
+  const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
+    text
+  )}&tl=${lang}`;
+
+  try {
+    const response = await fetch(url);
+    const audioData = await response.arrayBuffer();
+
+    const audioContext = new AudioContext();
+    const audioBuffer = await audioContext.decodeAudioData(audioData);
+
+    const sourceNode = audioContext.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+    sourceNode.connect(audioContext.destination);
+    sourceNode.start(0);
+  } catch (error) {
+    console.debug("Error playing audio in BACK:", error);
+  }
+};
+
+export default (props) => {
   const { text, lang } = props;
   const canListen = text && text.length < 200;
   if (!canListen) return null;
@@ -31,7 +52,7 @@ export default props => {
   return (
     <button
       className="listenButton"
-      onClick={() => playAudio(text, lang)}
+      onClick={() => playAudioInBackground(text, lang)}
       title={browser.i18n.getMessage("listenLabel")}
     >
       <SpeakerIcon />
