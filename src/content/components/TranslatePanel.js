@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { getSettings } from "src/settings/settings";
 import "../styles/TranslatePanel.scss";
+import SpeakerIcon from "../../popup/icons/speaker.svg";
+import "../../popup/styles/ListenButton.scss";
 import {
   getBackgroundColor,
   getCandidateFontColor,
@@ -222,6 +224,13 @@ export default class TranslatePanel extends Component {
             ref="move"
           ></div>
           <div className="simple-translate-result-contents">
+            <button
+              className="listenButton"
+              onClick={() => playAudio(text, lang)}
+              title={browser.i18n.getMessage("listenLabel")}
+            >
+              <SpeakerIcon />
+            </button>
             <p
               className="simple-translate-result"
               style={getResultFontColor()}
