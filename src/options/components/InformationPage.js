@@ -8,18 +8,18 @@ import {
   patreonLink,
   email,
   chromeExtensionUrl,
-  firefoxAddonUrl
+  firefoxAddonUrl,
 } from "src/common/personalUrls";
 import manifest from "src/manifest-chrome.json";
 
-export default props => {
+export default (props) => {
   const query = queryString.parse(props.location.search);
   const extensionVersion = manifest.version;
 
   const [sponsorsHeihgt, setSponsorsHeight] = useState();
 
   useEffect(() => {
-    const setHeight = e => {
+    const setHeight = (e) => {
       if (e.data[0] !== "setSponsorsHeight") return;
       setSponsorsHeight(e.data[1]);
     };
@@ -31,7 +31,9 @@ export default props => {
 
   return (
     <div>
-      <p className="contentTitle">{browser.i18n.getMessage("informationLabel")}</p>
+      <p className="contentTitle">
+        {browser.i18n.getMessage("informationLabel")}
+      </p>
       <hr />
       <OptionsContainer
         title={"extName"}
@@ -40,7 +42,10 @@ export default props => {
         updated={query.action === "updated"}
         extraCaption={
           <p className="caption">
-            <a href="https://github.com/sienori/simple-translate/releases" target="_blank">
+            <a
+              href="https://github.com/amm1rr/simple-translate-plus/releases"
+              target="_blank"
+            >
               Version {extensionVersion}
             </a>
             <span>　</span>
@@ -61,7 +66,7 @@ export default props => {
         type={"none"}
       />
 
-      {!hasPermission &&
+      {!hasPermission && (
         <>
           <hr />
           <OptionsContainer
@@ -72,10 +77,14 @@ export default props => {
             onClick={requestPermission}
           />
         </>
-      }
+      )}
 
       <hr />
-      <OptionsContainer title={"donationLabel"} captions={["donationCaptionLabel"]} type={"none"} />
+      <OptionsContainer
+        title={"donationLabel"}
+        captions={["donationCaptionLabel"]}
+        type={"none"}
+      />
       <OptionsContainer
         title={""}
         captions={[""]}
@@ -83,8 +92,11 @@ export default props => {
         extraCaption={
           <div>
             <a href={patreonLink} target="_blank">
-              <img src="/icons/patreonButton.png" alt="Patreon"
-                style={{ height: 44, marginInlineEnd: 20 }} />
+              <img
+                src="/icons/patreonButton.png"
+                alt="Patreon"
+                style={{ height: 44, marginInlineEnd: 20 }}
+              />
             </a>
             <a href={paypalLink} target="_blank">
               <img src="/icons/paypalButton.png" alt="Paypal" />
@@ -99,7 +111,11 @@ export default props => {
         extraCaption={
           <div>
             <p className="caption">
-              <a className="amazonUrl" href={browser.i18n.getMessage("amazonUrl")} target="_blank">
+              <a
+                className="amazonUrl"
+                href={browser.i18n.getMessage("amazonUrl")}
+                target="_blank"
+              >
                 {browser.i18n.getMessage("amazonTitleLabel")}
               </a>
             </p>
@@ -113,8 +129,10 @@ export default props => {
         captions={[""]}
         type={"none"}
         extraCaption={
-          <iframe src="https://simple-translate.sienori.com/sponsors.html"
-            style={{ height: sponsorsHeihgt, marginTop: 10 }} />
+          <iframe
+            src="https://simple-translate.sienori.com/sponsors.html"
+            style={{ height: sponsorsHeihgt, marginTop: 10 }}
+          />
         }
       />
       <hr />
@@ -130,16 +148,22 @@ export default props => {
                   {browser.i18n.getMessage("extensionPageLabel")}
                 </a>
               ) : (
-                  <a href={firefoxAddonUrl} target="_blank">
-                    {browser.i18n.getMessage("addonPageLabel")}
-                  </a>
-                )}
+                <a href={firefoxAddonUrl} target="_blank">
+                  {browser.i18n.getMessage("addonPageLabel")}
+                </a>
+              )}
               <span>　</span>
-              <a href="https://github.com/sienori/simple-translate" target="_blank">
+              <a
+                href="https://github.com/amm1rr/simple-translate-plus"
+                target="_blank"
+              >
                 GitHub
               </a>
               <span>　</span>
-              <a href="https://simple-translate.sienori.com/privacy-policy" target="_blank">
+              <a
+                href="https://simple-translate.sienori.com/privacy-policy"
+                target="_blank"
+              >
                 {browser.i18n.getMessage("privacyPolicyLabel")}
               </a>
             </p>
@@ -154,26 +178,22 @@ const useAdditionalPermission = () => {
   const [hasPermission, setHasPermission] = useState(true);
 
   const permissions = {
-    origins: [
-      "http://*/*",
-      "https://*/*",
-      "<all_urls>"
-    ]
+    origins: ["http://*/*", "https://*/*", "<all_urls>"],
   };
 
   const checkPermission = async () => {
     const hasPermission = await browser.permissions.contains(permissions);
     setHasPermission(hasPermission);
-  }
+  };
 
   const requestPermission = async () => {
     await browser.permissions.request(permissions);
     checkPermission();
-  }
+  };
 
   useEffect(() => {
     checkPermission();
   }, []);
 
   return [hasPermission, requestPermission];
-}
+};
