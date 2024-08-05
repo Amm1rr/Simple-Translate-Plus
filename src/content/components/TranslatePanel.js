@@ -5,6 +5,7 @@ import { getSettings } from "src/settings/settings";
 import "../styles/TranslatePanel.scss";
 import SpeakerIcon from "../../popup/icons/speaker.svg";
 import "../../popup/styles/ListenButton.scss";
+import { playAudioInBackground } from "../../common/translate";
 import {
   getBackgroundColor,
   getCandidateFontColor,
@@ -223,21 +224,29 @@ export default class TranslatePanel extends Component {
             draggable="true"
             ref="move"
           ></div>
+
           <div className="simple-translate-result-contents">
-            <button
-              className="listenButton"
-              onClick={() => playAudio(text, lang)}
-              title={browser.i18n.getMessage("listenLabel")}
+            <div
+              id="text-and-voice_icon"
+              style={{ display: "flex", alignItems: "left" }}
             >
-              <SpeakerIcon />
-            </button>
-            <p
-              className="simple-translate-result"
-              style={getResultFontColor()}
-              dir="auto"
-            >
-              {splitLine(resultText)}
-            </p>
+              <button
+                className="listenButton"
+                onClick={() => playAudioInBackground("Yes, It's working", "en")}
+                title={browser.i18n.getMessage("listenLabel")}
+                style={{ marginRight: "10px", marginLeft: "10px" }}
+              >
+                <SpeakerIcon />
+              </button>
+              <p
+                className="simple-translate-result"
+                style={getResultFontColor()}
+                dir="auto"
+              >
+                {splitLine(resultText)}
+              </p>
+            </div>
+
             <p
               className="simple-translate-candidate"
               style={getCandidateFontColor()}
