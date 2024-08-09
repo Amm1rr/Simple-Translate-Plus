@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
+import { ListenTTS } from "../popup/components/ListenButton";
 
 const logDir = "common/translate";
 
@@ -32,28 +33,7 @@ const setHistory = async (
   });
 };
 
-export const playAudioInBackground = async (text, lang) => {
-  const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-    text
-  )}&tl=${lang}`;
-
-  try {
-    const response = await fetch(url);
-    const audioData = await response.arrayBuffer();
-
-    const audioContext = new AudioContext();
-    const audioBuffer = await audioContext.decodeAudioData(audioData);
-
-    const sourceNode = audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer;
-    sourceNode.connect(audioContext.destination);
-    sourceNode.start(0);
-  } catch (error) {
-    console.debug("Error playing audio in BACK:", error);
-  }
-};
-
-const sendRequestToGoogle = async (word, sourceLang, targetLang) => {
+const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=bd&dj=1&q=${encodeURIComponent(
     word
   )}`;
@@ -105,10 +85,21 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang) => {
       .join("");
   }
 
-  const autoPlay = getSettings("ifautoPlayListen");
+  let autoPlay;
+  if (listen === true) {
+    autoPlay = true;
+  } else if (listen === false) {
+    autoPlay = false;
+  } else {
+    autoPlay = getSettings("ifautoPlayListen");
+  }
+
+  console.log("autoplay: " + autoPlay);
+
   if (autoPlay) {
     log.log(logDir, "autoPlayListen()", word);
-    playAudioInBackground(word, resultData.sourceLanguage);
+    console.log("autoPlayListen()", word);
+    ListenTTS("background", word, resultData.sourceLanguage);
   }
 
   log.log(logDir, "sendRequest()", resultData);
@@ -168,7 +159,7 @@ const sendRequestToDeepL = async (word, sourceLang, targetLang) => {
   return resultData;
 };
 
-export default async (sourceWord, sourceLang = "auto", targetLang) => {
+export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
   log.log(logDir, "tranlate()", sourceWord, targetLang);
   sourceWord = sourceWord.trim();
   if (sourceWord === "")
@@ -192,7 +183,7 @@ export default async (sourceWord, sourceLang = "auto", targetLang) => {
 
   const result =
     translationApi === "google"
-      ? await sendRequestToGoogle(sourceWord, sourceLang, targetLang)
+      ? await sendRequestToGoogle(sourceWord, sourceLang, targetLang, listen)
       : await sendRequestToDeepL(sourceWord, sourceLang, targetLang);
   setHistory(sourceWord, sourceLang, targetLang, translationApi, result);
   return result;

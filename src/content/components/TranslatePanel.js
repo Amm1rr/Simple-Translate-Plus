@@ -3,14 +3,13 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { getSettings } from "src/settings/settings";
 import "../styles/TranslatePanel.scss";
-import SpeakerIcon from "../../popup/icons/speaker.svg";
 import "../../popup/styles/ListenButton.scss";
-import { playAudioInBackground } from "../../common/translate";
 import {
   getBackgroundColor,
   getCandidateFontColor,
   getResultFontColor,
 } from "../../settings/defaultColors";
+import ListenButton from "../../popup/components/ListenButton";
 
 const splitLine = (text) => {
   const regex = /(\n)/g;
@@ -230,14 +229,7 @@ export default class TranslatePanel extends Component {
               id="text-and-voice_icon"
               style={{ display: "flex", alignItems: "left" }}
             >
-              <button
-                className="listenButton"
-                onClick={() => playAudioInBackground("Yes, It's working", "en")}
-                title={browser.i18n.getMessage("listenLabel")}
-                style={{ marginRight: "10px", marginLeft: "10px" }}
-              >
-                <SpeakerIcon />
-              </button>
+              <ListenButton text={resultText} lang={currentLang} />
               <p
                 className="simple-translate-result"
                 style={getResultFontColor()}
