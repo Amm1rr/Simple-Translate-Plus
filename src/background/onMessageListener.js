@@ -9,6 +9,7 @@ export default async (data) => {
       return await translate(data.text, data.sourceLang, data.targetLang);
     }
     case "listen": {
+      console.log("onMessageListener listen : ", data);
       return await translate(data.text, data.sourceLang, data.targetLang, true);
       // return await ListenTTS("origin", data.text, data.sourceLang);
     }

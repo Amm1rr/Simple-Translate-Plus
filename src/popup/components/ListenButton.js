@@ -3,6 +3,7 @@ import browser from "webextension-polyfill";
 import log from "loglevel";
 import SpeakerIcon from "../icons/speaker.svg";
 import "../styles/ListenButton.scss";
+import { LOCAL_TTS_SERVER } from "../../common/local_tts_server";
 
 const logDir = "popup/AudioButton";
 
@@ -38,81 +39,75 @@ export const playAudioInBackground = async (text, lang) => {
     sourceNode.connect(audioContext.destination);
     sourceNode.start(0);
   } catch (error) {
-    console.debug("Error playing audio in BACK:", error);
+    console.debug("Error playing audio in playAudioInBackground:", error);
   }
 };
 
-export const playAudioOrigin = async (text, lang) => {
-  const baseUrl = "https://translate.google.com/translate_tts";
-  const params = new URLSearchParams({
-    client: "tw-ob",
-    q: text,
-    tl: lang,
-  });
-  const googleTtsUrl = `${baseUrl}?${params}`;
-  const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
-    googleTtsUrl
-  )}`;
-
-  console.log("Generated Google TTS URL:", googleTtsUrl);
-  console.log("Encoded URL for AllOrigins:", url);
+export const playAudioInBackgroundOrigin = async (text, lang) => {
+  const url = `${LOCAL_TTS_SERVER}/translate_tts?text=${encodeURIComponent(
+    text
+  )}&lang=${lang}`;
 
   try {
+    console.log("Generated Google TTS URL:", url);
     const response = await fetch(url);
-    const data = await response.json();
+    const audioData = await response.arrayBuffer();
 
-    console.log("Full response:", data);
+    const audioContext = new AudioContext();
+    const audioBuffer = await audioContext.decodeAudioData(audioData);
 
-    if (data.contents && data.contents.startsWith("data:audio/mpeg;base64,")) {
-      console.log("Audio data found, processing...");
-
-      const base64Data = data.contents.split(",")[1];
-      console.log("Base64 audio data:", base64Data);
-
-      const audioData = atob(base64Data);
-      const arrayBuffer = new ArrayBuffer(audioData.length);
-      const uintArray = new Uint8Array(arrayBuffer);
-
-      for (let i = 0; i < audioData.length; i++) {
-        uintArray[i] = audioData.charCodeAt(i);
-      }
-
-      console.log("Decoded audio data to Uint8Array:", uintArray);
-
-      const audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-      console.log("Decoded audio buffer:", audioBuffer);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
-
-      console.log("Audio playback started");
-    } else {
-      console.error("No valid audio data found in the response");
-    }
+    const sourceNode = audioContext.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+    sourceNode.connect(audioContext.destination);
+    sourceNode.start(0);
   } catch (error) {
-    console.error("Error playing audio:", error);
+    console.debug("Error playing audio in playAudioInBackgroundOrigin:", error);
   }
+};
+
+export const getPageLanguage = () => {
+  // Helper function to extract the base language code
+  const getBaseLanguage = (lang) => {
+    if (!lang) return "en"; // Default to English if no language is found
+    return lang.split("-")[0].toLowerCase();
+  };
+
+  // Check if the language is specified in the HTML lang attribute
+  const htmlLang = document.documentElement.lang;
+  if (htmlLang) {
+    return getBaseLanguage(htmlLang);
+  }
+
+  // Check if the language is specified in the meta tag
+  const metaLang = document.querySelector('meta[name="language"]');
+  if (metaLang && metaLang.content) {
+    return getBaseLanguage(metaLang.content);
+  }
+
+  // Check the user's preferred language
+  const userLang = navigator.language || navigator.userLanguage;
+  if (userLang) {
+    return getBaseLanguage(userLang);
+  }
+
+  // Default to English if no language is found
+  return "en";
 };
 
 export const ListenTTS = async (services = "origin", text, lang) => {
   const { tts } = services;
   if (tts == "google") {
     await playAudio(text, lang);
+    console.log("Playing audio : ", text);
   } else if (tts == "background") {
+    console.log("Playing audio in background : ", text);
     await playAudioInBackground(text, lang);
   } else {
-    await playAudioOrigin(text, lang);
-    // const result = await browser.runtime.sendMessage({
-    //   message: "listen",
-    //   text: text,
-    //   sourceLang: "en",
-    //   targetLang: "fa",
-    // });
+    console.log("Playing audio in origin : ", text, lang);
+
+    const currentLanguage = getPageLanguage();
+
+    playAudioInBackgroundOrigin(text, currentLanguage);
   }
 };
 

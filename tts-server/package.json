@@ -1,0 +1,17 @@
+{
+  "name": "gtplus-tts-server",
+  "version": "0.1.0",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node tts-server.mjs"
+  },
+  "keywords": [],
+  "author": "Amm1rr",
+  "license": "MIT",
+  "description": "A Node.js server for translating text to speech using Google Translate's TTS API.",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  }
+}

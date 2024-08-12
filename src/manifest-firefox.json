@@ -10,6 +10,7 @@
     }
   },
   "permissions": ["storage", "contextMenus"],
+  "host_permissions": ["http://localhost:3000/"],
   "options_ui": {
     "page": "options/index.html",
     "open_in_tab": true
@@ -49,7 +50,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/512.png"],
+      "resources": ["icons/512.png", "*.html", "*.js"],
       "matches": ["*://*/*"]
     }
   ],
