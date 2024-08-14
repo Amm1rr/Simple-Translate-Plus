@@ -121,7 +121,7 @@ export default (props) => {
       className="listenButton"
       onClick={() => ListenTTS("origin", text, lang)}
       title={browser.i18n.getMessage("listenLabel")}
-      style={inPanel ? { marginRight: "5px" } : {}}
+      style={inPanel ? { marginRight: "5px", marginTop: "2px" } : {}}
     >
       <SpeakerIcon />
     </button>
