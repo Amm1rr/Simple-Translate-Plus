@@ -12,16 +12,12 @@
 
 Thank you to the awesome **[backers](https://github.com/sienori/simple-translate/blob/master/BACKERS.md)** who supported Simple Translate!
 
-[<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://www.patreon.com/sienori)
-[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.me/sienoriExt)
+[<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)
+[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=6JKMSEY6AWQKC)
 
 ## Sponsors
 
-Support Simple Translate by [becoming a sponsor](https://www.patreon.com/join/sienori). Thank you to our wonderful sponsors!
-
-[<img src="docs/img/toucan.png" alt="Toucan" height=110px align="left">](https://jointoucan.com/partners/tab-session-manager)
-
-[<img src="docs/img/becomeSponsor.png" alt="Become a Sponsor" height=110px>](https://www.patreon.com/join/sienori)
+Support Simple Translate Plus by [becoming a sponsor](https://patreon.com/Simple_Translate_Plus). Thank you to our wonderful sponsors!
 
 ## Translation
 
@@ -31,7 +27,7 @@ You can contribute by translating Simple Translate on **[Crowdin](https://crowdi
 
 > Required Node 18.17.1
 
-1. Clone the repository `git clone https://github.com/sienori/simple-translate`
+1. Clone the repository `git clone https://github.com/amm1rr/simple-translate-plus`
 2. Run `npm install`
 3. Run `npm run watch-dev`
 
