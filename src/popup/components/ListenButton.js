@@ -7,11 +7,6 @@ import { LOCAL_TTS_SERVER } from "../../common/local_tts_server";
 
 const logDir = "popup/AudioButton";
 
-// export const ListenText = async (buttonInstance, text, lang) => {
-//   // Assuming buttonInstance is an instance of ListenButton
-//   await buttonInstance.ListenTTS("origin", text, lang);
-// };
-
 export default class ListenButton extends Component {
   constructor(props) {
     super(props);
@@ -112,14 +107,14 @@ export default class ListenButton extends Component {
 
   ListenTTS = async (services = "origin", text, lang) => {
     const { tts } = services;
-    if (tts === "google") {
+    if (tts == "google") {
       await playAudio(text, lang);
       console.log("Playing audio:", text);
-    } else if (tts === "background") {
+    } else if (tts == "background") {
       console.log("Playing audio in background:", text);
       await playAudioInBackground(text, lang);
     } else {
-      console.log("Playing audio in origin:", text, lang);
+      console.log("Playing audio in origin:", tts, text, lang);
 
       const currentLanguage = this.getPageLanguage();
 
@@ -128,8 +123,15 @@ export default class ListenButton extends Component {
   };
 
   handleClick = () => {
-    const { text, lang } = this.props;
-    this.ListenTTS("origin", text, lang);
+    const { text, lang, inPanel } = this.props;
+    console.log("ListenButton.js -> handleClick", inPanel);
+    if (inPanel == true) {
+      console.log("Play IN PANEL:", text);
+      this.ListenTTS("origin", text, lang);
+    } else {
+      console.log("Play IN POPUP:", text);
+      this.ListenTTS("background", text, lang);
+    }
   };
 
   render() {

@@ -86,7 +86,7 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
   }
 
   let autoPlay;
-  if (listen === true) {
+  if (listen == true) {
     autoPlay = true;
   } else if (listen === false) {
     autoPlay = false;
@@ -97,8 +97,42 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
   if (autoPlay) {
     log.log(logDir, "autoPlayListen()", word);
     console.log("autoPlayListen()", word);
+
+    // const result = await browser.runtime.sendMessage({
+    //   message: "listen",
+    //   text: word,
+    //   sourceLang: "en",
+    //   targetLang: targetLang,
+    // });
+
     // const listenTTS = new ListenButton();
     // ListenButton.ListenTTS("background", word, resultData.sourceLanguage);
+
+    if (sourceLang === "auto") {
+      sourceLang = "en";
+    }
+
+    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
+      word
+    )}&tl=${sourceLang}&samesite=none;secure`;
+
+    try {
+      const response = await fetch(url);
+      const audioData = await response.arrayBuffer();
+
+      const audioContext = new AudioContext();
+      const audioBuffer = await audioContext.decodeAudioData(audioData);
+
+      const sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+      sourceNode.connect(audioContext.destination);
+      sourceNode.start(0);
+    } catch (error) {
+      console.debug(
+        "Error auto playing audio in playAudioInBackground:",
+        error
+      );
+    }
   }
 
   log.log(logDir, "sendRequest()", resultData);
