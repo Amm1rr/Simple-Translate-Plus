@@ -228,7 +228,11 @@ export default class TranslatePanel extends Component {
               id="text-and-voice_icon"
               style={{ display: "flex", alignItems: "left" }}
             >
-              <ListenButton text={selectedText} lang={currentLang} inPanel />
+              <ListenButton
+                text={selectedText}
+                lang={currentLang}
+                inPanel={true}
+              />
               <p
                 className="simple-translate-result"
                 style={getResultFontColor()}
