@@ -7,6 +7,11 @@ import { LOCAL_TTS_SERVER } from "../../common/local_tts_server";
 
 const logDir = "popup/AudioButton";
 
+// export const ListenText = async (buttonInstance, text, lang) => {
+//   // Assuming buttonInstance is an instance of ListenButton
+//   await buttonInstance.ListenTTS("origin", text, lang);
+// };
+
 export default class ListenButton extends Component {
   constructor(props) {
     super(props);

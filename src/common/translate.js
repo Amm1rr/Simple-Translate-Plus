@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
-import ListenButton from "../popup/components/ListenButton";
+// import ListenButton from "../popup/components/ListenButton";
 
 const logDir = "common/translate";
 
@@ -94,13 +94,11 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
     autoPlay = getSettings("ifautoPlayListen");
   }
 
-  console.log("autoplay: " + autoPlay);
-
   if (autoPlay) {
     log.log(logDir, "autoPlayListen()", word);
     console.log("autoPlayListen()", word);
-    const listenTTS = new ListenButton();
-    listenTTS.ListenTTS("background", word, resultData.sourceLanguage);
+    // const listenTTS = new ListenButton();
+    // ListenButton.ListenTTS("background", word, resultData.sourceLanguage);
   }
 
   log.log(logDir, "sendRequest()", resultData);
