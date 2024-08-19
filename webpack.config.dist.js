@@ -11,7 +11,7 @@ const {
   getZipPlugin,
   getFirefoxCopyPlugins,
   getMiniCssExtractPlugin,
-  getEntry
+  getEntry,
 } = require("./webpack.utils");
 const path = require("path");
 const config = require("./config.json");
@@ -26,8 +26,9 @@ const generalConfig = {
   resolve: {
     alias: {
       src: path.resolve(__dirname, "src/"),
-      "webextension-polyfill": "webextension-polyfill/dist/browser-polyfill.min.js"
-    }
+      "webextension-polyfill":
+        "webextension-polyfill/dist/browser-polyfill.min.js",
+    },
   },
   module: {
     rules: [
@@ -36,8 +37,8 @@ const generalConfig = {
         exclude: /node_modules/,
         test: /\.(js|jsx)$/,
         resolve: {
-          extensions: [".js", ".jsx"]
-        }
+          extensions: [".js", ".jsx"],
+        },
       },
       {
         test: /\.(scss|css)$/,
@@ -46,20 +47,20 @@ const generalConfig = {
           {
             loader: "css-loader",
             options: {
-              esModule: false
-            }
+              esModule: false,
+            },
           },
           {
-            loader: "sass-loader"
-          }
-        ]
+            loader: "sass-loader",
+          },
+        ],
       },
       {
         test: /\.svg$/,
-        use: ["@svgr/webpack"]
-      }
-    ]
-  }
+        use: ["@svgr/webpack"],
+      },
+    ],
+  },
 };
 
 module.exports = [
@@ -68,37 +69,47 @@ module.exports = [
     output: getOutput("chrome", config.tempDirectory),
     entry: getEntry(config.chromePath),
     optimization: {
-      minimize: true
+      minimize: true,
     },
     plugins: [
       new CleanWebpackPlugin(["dist", "temp"]),
       ...getMiniCssExtractPlugin(),
       ...getHTMLPlugins("chrome", config.tempDirectory, config.chromePath),
       ...getCopyPlugins("chrome", config.tempDirectory, config.chromePath),
-      getZipPlugin(`${config.extName}-for-chrome-${extVersion}`, config.distDirectory)
-    ]
+      getZipPlugin(
+        `${config.extName}-for-chrome-${extVersion}`,
+        config.distDirectory
+      ),
+    ],
   },
   {
     ...generalConfig,
     entry: getEntry(config.firefoxPath),
     output: getOutput("firefox", config.tempDirectory),
     optimization: {
-      minimize: true
+      minimize: true,
     },
     plugins: [
       new CleanWebpackPlugin(["dist", "temp"]),
       ...getMiniCssExtractPlugin(),
       ...getHTMLPlugins("firefox", config.tempDirectory, config.firefoxPath),
-      ...getFirefoxCopyPlugins("firefox", config.tempDirectory, config.firefoxPath),
-      getZipPlugin(`${config.extName}-for-firefox-${ffExtVersion}`, config.distDirectory)
-    ]
+      ...getFirefoxCopyPlugins(
+        "firefox",
+        config.tempDirectory,
+        config.firefoxPath
+      ),
+      getZipPlugin(
+        `${config.extName}-for-firefox-${ffExtVersion}`,
+        config.distDirectory
+      ),
+    ],
   },
   {
     mode: "production",
     resolve: {
       alias: {
-        src: path.resolve(__dirname, "src/")
-      }
+        src: path.resolve(__dirname, "src/"),
+      },
     },
     entry: { other: path.resolve(__dirname, `src/background/background.js`) },
     output: getOutput("copiedSource", config.tempDirectory),
@@ -107,19 +118,29 @@ module.exports = [
         patterns: [
           {
             from: `src`,
-            to: path.resolve(__dirname, `${config.tempDirectory}/copiedSource/src/`),
-            info: { minimized: true }
+            to: path.resolve(
+              __dirname,
+              `${config.tempDirectory}/copiedSource/src/`
+            ),
+            info: { minimized: true },
           },
           {
             from: "*",
-            to: path.resolve(__dirname, `${config.tempDirectory}/copiedSource/`),
+            to: path.resolve(
+              __dirname,
+              `${config.tempDirectory}/copiedSource/`
+            ),
             globOptions: {
-              ignore: ["**/BACKERS.md", "**/crowdin.yml"]
-            }
-          }
-        ]
+              ignore: ["**/BACKERS.md", "**/crowdin.yml"],
+            },
+          },
+        ],
       }),
-      getZipPlugin(`copiedSource-${config.extName}-${ffExtVersion}`, config.distDirectory, "other/")
-    ]
-  }
+      getZipPlugin(
+        `copiedSource-${config.extName}-${ffExtVersion}`,
+        config.distDirectory,
+        "other/"
+      ),
+    ],
+  },
 ];

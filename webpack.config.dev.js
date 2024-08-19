@@ -9,7 +9,7 @@ const {
   getCopyPlugins,
   getFirefoxCopyPlugins,
   getEntry,
-  getMiniCssExtractPlugin
+  getMiniCssExtractPlugin,
 } = require("./webpack.utils");
 const path = require("path");
 const config = require("./config.json");
@@ -21,8 +21,9 @@ const generalConfig = {
   resolve: {
     alias: {
       src: path.resolve(__dirname, "src/"),
-      "webextension-polyfill": "webextension-polyfill/dist/browser-polyfill.min.js"
-    }
+      "webextension-polyfill":
+        "webextension-polyfill/dist/browser-polyfill.min.js",
+    },
   },
   module: {
     rules: [
@@ -31,8 +32,8 @@ const generalConfig = {
         exclude: /node_modules/,
         test: /\.(js|jsx)$/,
         resolve: {
-          extensions: [".js", ".jsx"]
-        }
+          extensions: [".js", ".jsx"],
+        },
       },
       {
         test: /\.(scss|css)$/,
@@ -41,22 +42,23 @@ const generalConfig = {
           {
             loader: "css-loader",
             options: {
-              esModule: false
-            }
+              esModule: false,
+            },
           },
           {
-            loader: "sass-loader"
-          }
-        ]
+            loader: "sass-loader",
+          },
+        ],
       },
       {
         test: /\.svg$/,
-        use: ["@svgr/webpack"]
-      }
-    ]
-  }
+        use: ["@svgr/webpack"],
+      },
+    ],
+  },
 };
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 module.exports = [
   {
     ...generalConfig,
@@ -65,8 +67,8 @@ module.exports = [
     plugins: [
       ...getMiniCssExtractPlugin(),
       ...getHTMLPlugins("chrome", config.devDirectory, config.chromePath),
-      ...getCopyPlugins("chrome", config.devDirectory, config.chromePath)
-    ]
+      ...getCopyPlugins("chrome", config.devDirectory, config.chromePath),
+    ],
   },
   {
     ...generalConfig,
@@ -74,13 +76,17 @@ module.exports = [
     output: getOutput("firefox", config.devDirectory),
     plugins: [
       ...getMiniCssExtractPlugin(),
-      ...getFirefoxCopyPlugins("firefox", config.devDirectory, config.firefoxPath),
+      ...getFirefoxCopyPlugins(
+        "firefox",
+        config.devDirectory,
+        config.firefoxPath
+      ),
       ...getHTMLPlugins("firefox", config.devDirectory, config.firefoxPath),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerHost: "127.0.0.1",
-        analyzerPort: 8888
-      })
-    ]
-  }
+        analyzerPort: 8888,
+      }),
+    ],
+  },
 ];
