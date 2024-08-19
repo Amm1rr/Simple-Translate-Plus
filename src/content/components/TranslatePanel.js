@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { getSettings } from "src/settings/settings";
 import "../styles/TranslatePanel.scss";
-import "../../popup/styles/ListenButton.scss";
 import {
   getBackgroundColor,
   getCandidateFontColor,
