@@ -13,7 +13,7 @@
 Thank you to the awesome **[backers](https://github.com/sienori/simple-translate/blob/master/BACKERS.md)** who supported Simple Translate Plus!
 
 [<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)
-[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=6JKMSEY6AWQKC)
+[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
 
 ## Sponsors
 
@@ -21,7 +21,7 @@ Support Simple Translate Plus by [becoming a sponsor](https://patreon.com/Simple
 
 ## Translation
 
-You can contribute by translating Simple Translate Plus on **[Crowdin](https://crowdin.com/project/simple-translate-plus)**.
+You can contribute by translating Simple Translate Plus on **[Crowdin](https://crowdin.com/project/simple-translate)**.
 
 ## Developing
 
@@ -35,18 +35,18 @@ You can contribute by translating Simple Translate Plus on **[Crowdin](https://c
 
 1. Open Chrome browser and navigate to `chrome://extensions`
 2. Select "Developer Mode" and then click "Load unpacked extension..."
-3. From the file browser, choose to `simple-translate/dev/chrome`
+3. From the file browser, choose to `simple-translate-plus/dev/chrome`
 
 ### Load the extension in Edge
 
 1. Open Edge browser and navigate to `edge://extensions`
 2. Select "Developer Mode" and then click "Load unpacked"
-3. From the file browser, choose to `simple-translate/dev/chrome`
+3. From the file browser, choose to `simple-translate-plus/dev/chrome`
 
 ### Load the extension in Firefox
 
 1. Open Firefox browser and navigate to `about:debugging`
-2. Click "Load Temporary Add-on" and from the file browser, choose `simple-translate/dev/firefox`
+2. Click "Load Temporary Add-on" and from the file browser, choose `simple-translate-plus/dev/firefox`
 
 ## Privacy Policy
 
