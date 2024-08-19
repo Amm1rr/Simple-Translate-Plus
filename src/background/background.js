@@ -26,16 +26,16 @@ if (!!browser.contextMenus?.onShown)
   browser.contextMenus.onShown.addListener(onMenusShownListener);
 browser.contextMenus.onClicked.addListener(onMenusClickedListener);
 
-//-- Set-Cookie > SameSite=strict|Lax
-// if (browser.webNavigation) {
-//   browser.webNavigation.onCompleted.addListener(function (details) {
-//     browser.tabs.executeScript({
-//       code: `
-//         document.head.insertAdjacentHTML('beforeend', '<meta http-equiv="Set-Cookie" content="SameSite=strict">');
-//       `,
-//     });
-//   });
-// }
+// Set-Cookie > SameSite=Strict|Lax|None
+if (browser.webNavigation) {
+  browser.webNavigation.onCompleted.addListener(function (details) {
+    browser.tabs.executeScript({
+      code: `
+        document.head.insertAdjacentHTML('beforeend', '<meta http-equiv="Set-Cookie" content="SameSite=None;Secure">');
+      `,
+    });
+  });
+}
 
 const init = async () => {
   await initSettings();

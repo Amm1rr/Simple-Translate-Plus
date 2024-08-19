@@ -16,17 +16,20 @@ const openSettings = () => {
   openUrl(url);
 };
 
-const getToggleButtonTitle = isEnabled => {
+const getToggleButtonTitle = (isEnabled) => {
   return isEnabled
     ? browser.i18n.getMessage("disableOnThisPage")
     : browser.i18n.getMessage("enableOnThisPage");
 };
 
-export default props => (
+export default (props) => (
   <div id="header">
-    <div className="title">Simple Translate</div>
+    <div className="title">Simple Translate+</div>
     <div className="rightButtons">
-      <div className="toggleButton" title={getToggleButtonTitle(props.isEnabledOnPage)}>
+      <div
+        className="toggleButton"
+        title={getToggleButtonTitle(props.isEnabledOnPage)}
+      >
         <Toggle
           checked={props.isEnabledOnPage}
           onChange={props.toggleEnabledOnPage}
