@@ -1,4 +1,4 @@
-# <sub><img src="/src/icons/64.png" width=64px height=64px></sub> Simple Translate
+# <sub><img src="/src/icons/64.png" width=64px height=64px></sub> Simple Translate Plus
 
 #### Quickly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
 
@@ -10,7 +10,7 @@
 
 ## Backers
 
-Thank you to the awesome **[backers](https://github.com/sienori/simple-translate/blob/master/BACKERS.md)** who supported Simple Translate!
+Thank you to the awesome **[backers](https://github.com/sienori/simple-translate/blob/master/BACKERS.md)** who supported Simple Translate Plus!
 
 [<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)
 [<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=6JKMSEY6AWQKC)
@@ -21,7 +21,7 @@ Support Simple Translate Plus by [becoming a sponsor](https://patreon.com/Simple
 
 ## Translation
 
-You can contribute by translating Simple Translate on **[Crowdin](https://crowdin.com/project/simple-translate)**.
+You can contribute by translating Simple Translate Plus on **[Crowdin](https://crowdin.com/project/simple-translate-plus)**.
 
 ## Developing
 
@@ -50,4 +50,4 @@ You can contribute by translating Simple Translate on **[Crowdin](https://crowdi
 
 ## Privacy Policy
 
-[Privacy Policy](https://simple-translate.sienori.com/privacy-policy) of Simple Translate
+[Privacy Policy](https://simple-translate.sienori.com/privacy-policy) of Simple Translate Plus
