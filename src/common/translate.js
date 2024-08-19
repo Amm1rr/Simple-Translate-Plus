@@ -193,7 +193,7 @@ const sendRequestToDeepL = async (word, sourceLang, targetLang) => {
 };
 
 export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
-  log.log(logDir, "tranlate()", sourceWord, targetLang);
+  log.log(logDir, "translate()", sourceWord, targetLang);
   sourceWord = sourceWord.trim();
   if (sourceWord === "")
     return {
