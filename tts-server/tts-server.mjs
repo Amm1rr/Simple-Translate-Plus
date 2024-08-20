@@ -52,5 +52,5 @@ app.get("/translate_tts", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Proxy server listening on port ${port}`);
+  console.info(`Proxy server listening on port ${port}`);
 });

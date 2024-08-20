@@ -96,7 +96,7 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
 
   if (autoPlay) {
     log.log(logDir, "autoPlayListen()", word);
-    console.log("autoPlayListen()", word);
+    console.debug("autoPlayListen()", word);
 
     // const result = await browser.runtime.sendMessage({
     //   message: "listen",

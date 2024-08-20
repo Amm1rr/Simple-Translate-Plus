@@ -37,6 +37,25 @@ if (browser.webNavigation) {
   });
 }
 
+export async function fetchAndListen(text, sourceLang = "en") {
+  try {
+    console.debug("fetchAndListen : ", sourceLang, text);
+    if (sourceLang == "auto") {
+      sourceLang = "en";
+    }
+    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
+      text
+    )}&tl=${sourceLang}&samesite=none;secure`;
+    const response = await fetch(url);
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 const init = async () => {
   await initSettings();
   overWriteLogLevel();

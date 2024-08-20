@@ -57,7 +57,7 @@ export default class ListenButton extends Component {
     )}&lang=${lang}`;
 
     try {
-      console.log("Generated Google TTS URL:", url);
+      console.debug("Generated Google TTS URL:", url);
       const response = await fetch(url);
       const audioData = await response.arrayBuffer();
 
@@ -109,12 +109,12 @@ export default class ListenButton extends Component {
     const { tts } = services;
     if (tts == "google") {
       await playAudio(text, lang);
-      console.log("Playing audio:", text);
+      console.debug("Playing audio:", text);
     } else if (tts == "background") {
-      console.log("Playing audio in background:", text);
+      console.debug("Playing audio in background:", text);
       await playAudioInBackground(text, lang);
     } else {
-      console.log("Playing audio in origin:", tts, text, lang);
+      console.debug("Playing audio in origin:", tts, text, lang);
 
       const currentLanguage = this.getPageLanguage();
 
@@ -124,14 +124,19 @@ export default class ListenButton extends Component {
 
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
-    console.log("ListenButton.js -> handleClick", inPanel);
-    if (inPanel == true) {
-      console.log("Play IN PANEL:", text);
-      this.ListenTTS("origin", text, lang);
-    } else {
-      console.log("Play IN POPUP:", text);
-      this.ListenTTS("background", text, lang);
-    }
+    console.debug(
+      "ListenButton.js -> Listen in Panel/Popup -> ",
+      inPanel,
+      text
+    );
+
+    browser.runtime.sendMessage({
+      action: "listen",
+      message: "listen",
+      text: text,
+    });
+    // this.ListenTTS("origin", text, lang);
+    // this.ListenTTS("background", text, lang);
   };
 
   render() {
