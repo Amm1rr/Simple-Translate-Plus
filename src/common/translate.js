@@ -98,15 +98,12 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
     log.log(logDir, "autoPlayListen()", word);
     console.debug("autoPlayListen()", word);
 
-    // const result = await browser.runtime.sendMessage({
+    // browser.runtime.sendMessage({
+    //   action: "listen",
     //   message: "listen",
     //   text: word,
-    //   sourceLang: "en",
-    //   targetLang: targetLang,
+    //   sourceLang: sourceLang,
     // });
-
-    // const listenTTS = new ListenButton();
-    // ListenButton.ListenTTS("background", word, resultData.sourceLanguage);
 
     if (sourceLang === "auto") {
       sourceLang = "en";

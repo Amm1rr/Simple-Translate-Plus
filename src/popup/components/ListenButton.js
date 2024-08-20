@@ -116,17 +116,19 @@ export default class ListenButton extends Component {
     } else {
       console.debug("Playing audio in origin:", tts, text, lang);
 
-      const currentLanguage = this.getPageLanguage();
+      const currentPageLanguage = this.getPageLanguage();
 
-      this.playAudioInBackgroundOrigin(text, currentLanguage);
+      this.playAudioInBackgroundOrigin(text, currentPageLanguage);
     }
   };
 
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
+    const currentPageLanguage = this.getPageLanguage();
     console.debug(
       "ListenButton.js -> Listen in Panel/Popup -> ",
       inPanel,
+      currentPageLanguage,
       text
     );
 
@@ -134,6 +136,7 @@ export default class ListenButton extends Component {
       action: "listen",
       message: "listen",
       text: text,
+      sourceLang: currentPageLanguage,
     });
     // this.ListenTTS("origin", text, lang);
     // this.ListenTTS("background", text, lang);
