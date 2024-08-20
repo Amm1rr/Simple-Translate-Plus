@@ -151,7 +151,7 @@ export default class ListenButton extends Component {
       <button
         className="listenButton"
         onClick={this.handleClick}
-        title={browser.i18n.getMessage("listenLabel")}
+        title={browser.i18n.getMessage("listenLabel") + " '" + text + "'"}
         style={inPanel ? { marginRight: "5px", marginTop: "2px" } : {}}
       >
         <SpeakerIcon />
