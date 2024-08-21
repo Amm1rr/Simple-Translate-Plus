@@ -1,27 +1,48 @@
-# <sub><img src="/src/icons/64.png" width=64px height=64px></sub> Simple Translate Plus
+# <sub><img src="./src/icons/64.png" width=64px height=64px></sub> Simple Translate Plus
 
 #### Quickly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
 
-[<img src="other/promotion/badges/firefox.png" align="left" alt="for Firefox">](https://addons.mozilla.org/firefox/addon/simple-translate/)
+[<img src="other/promotion/badges/firefox.png" align="left" alt="for Firefox (soon...)">](https://addons.mozilla.org/firefox/addon/simple-translate/)
 
-[<img src="other/promotion/badges/chrome.png" alt="for Chrome" height="60px">](https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace)
+[<img src="other/promotion/badges/chrome.png" alt="for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace)
 
 [for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl)
 
-## Backers
+## About
 
-Thank you to the awesome **[backers](https://github.com/sienori/simple-translate/blob/master/BACKERS.md)** who supported Simple Translate Plus!
+When you select text, the translation button pops up and the translation is displayed instantly.
+If you enable "Do not display the button if translation is not required" option, you will not get frustrated by the button appearing when it is not necessary.
 
-[<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)
-[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
+In the toolbar popup, translate the input text in real time.
+If you enable "Automatically switch to the second language" option, you can do : When English is input, it is translated into Japanese, and when Japanese is input, it is translated into English.
+
+You can also translate from the context menu.
+You can select "Translate this page", "Translate selected text", and "Translate selected link" from the menu on the page or tab.
+
+Supports Google Translate and DeepL API.
+
+Chrome version: https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace
+<br>
+Edge version: https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl
+
+## Features
+
+New features added to **Google Tranlate Plus** :
+
+- **New "Listen" Button:** Added a "Listen" button in the translation panel, allowing users to hear the translated text.
+- **Autoplay Pronunciation:** Implemented autoplay for pronunciation, which automatically plays the translation's pronunciation after the translation is generated.
 
 ## Sponsors
 
 Support Simple Translate Plus by [becoming a sponsor](https://patreon.com/Simple_Translate_Plus). Thank you to our wonderful sponsors!
 
+[<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
+
 ## Translation
 
 You can contribute by translating Simple Translate Plus on **[Crowdin](https://crowdin.com/project/simple-translate)**.
+
+##
 
 ## Developing
 
