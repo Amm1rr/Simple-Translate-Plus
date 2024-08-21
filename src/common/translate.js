@@ -105,7 +105,7 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
     //   sourceLang: sourceLang,
     // });
 
-    if (sourceLang === "auto") {
+    if (sourceLang == "auto") {
       sourceLang = "en";
     }
 
