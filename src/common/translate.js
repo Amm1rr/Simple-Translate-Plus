@@ -33,6 +33,55 @@ const setHistory = async (
   });
 };
 
+const autoplayPronunciation = async (word, sourceLang, listen) => {
+  let autoPlay;
+  if (listen == true) {
+    autoPlay = true;
+  } else if (listen === false) {
+    autoPlay = false;
+  } else {
+    autoPlay = getSettings("ifautoPlayListen");
+  }
+
+  if (autoPlay == true) {
+    log.log(logDir, "autoPlayListen() ON : ", word);
+    console.debug("autoPlayListen() ON : ", word);
+
+    // browser.runtime.sendMessage({
+    //   action: "listen",
+    //   message: "listen",
+    //   text: word,
+    //   sourceLang: sourceLang,
+    // });
+
+    if (sourceLang == "auto") {
+      sourceLang = "en";
+    }
+
+    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
+      word
+    )}&tl=${sourceLang}&samesite=none;secure`;
+
+    try {
+      const response = await fetch(url);
+      const audioData = await response.arrayBuffer();
+
+      const audioContext = new AudioContext();
+      const audioBuffer = await audioContext.decodeAudioData(audioData);
+
+      const sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+      sourceNode.connect(audioContext.destination);
+      sourceNode.start(0);
+    } catch (error) {
+      console.debug(
+        "Error auto playing audio in playAudioInBackground:",
+        error
+      );
+    }
+  }
+};
+
 const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=bd&dj=1&q=${encodeURIComponent(
     word
@@ -85,52 +134,7 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
       .join("");
   }
 
-  let autoPlay;
-  if (listen == true) {
-    autoPlay = true;
-  } else if (listen === false) {
-    autoPlay = false;
-  } else {
-    autoPlay = getSettings("ifautoPlayListen");
-  }
-
-  if (autoPlay) {
-    log.log(logDir, "autoPlayListen()", word);
-    console.debug("autoPlayListen()", word);
-
-    // browser.runtime.sendMessage({
-    //   action: "listen",
-    //   message: "listen",
-    //   text: word,
-    //   sourceLang: sourceLang,
-    // });
-
-    if (sourceLang == "auto") {
-      sourceLang = "en";
-    }
-
-    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-      word
-    )}&tl=${sourceLang}&samesite=none;secure`;
-
-    try {
-      const response = await fetch(url);
-      const audioData = await response.arrayBuffer();
-
-      const audioContext = new AudioContext();
-      const audioBuffer = await audioContext.decodeAudioData(audioData);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
-    } catch (error) {
-      console.debug(
-        "Error auto playing audio in playAudioInBackground:",
-        error
-      );
-    }
-  }
+  await autoplayPronunciation(word, sourceLang, listen);
 
   log.log(logDir, "sendRequest()", resultData);
 
