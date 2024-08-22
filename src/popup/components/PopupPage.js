@@ -44,7 +44,7 @@ const getTabInfo = async () => {
 };
 
 const UILanguage = browser.i18n.getUILanguage();
-const rtlLanguage = ["he", "ar"].includes(UILanguage);
+const rtlLanguage = ["he", "ar", "fa"].includes(UILanguage);
 const rtlLanguageClassName = rtlLanguage ? "popup-page-rtl-language" : "";
 
 export default class PopupPage extends Component {
