@@ -11,9 +11,37 @@ export default class ListenButton extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // Add any necessary state variables
+      voiceLang: props.initialVoiceLang || "en",
     };
   }
+
+  updateVoiceLang = (e) => {
+    this.setState({ voiceLang: e.voiceLang });
+    // console.debug("ListenButton.js -> updateVoiceLang -> State", this.state);
+  };
+
+  componentDidMount() {
+    if (this.isContentScript()) {
+      browser.runtime.onMessage.addListener(this.handleMessage);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.isContentScript()) {
+      browser.runtime.onMessage.removeListener(this.handleMessage);
+    }
+  }
+
+  isContentScript() {
+    return typeof window !== "undefined" && window.document;
+  }
+
+  handleMessage = (message) => {
+    // console.debug("ListenButton.js -> handleMessage", message);
+    if (message.action == "VoiceLanguage") {
+      this.updateVoiceLang(message);
+    }
+  };
 
   playAudio = async (text, lang) => {
     const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
@@ -116,7 +144,7 @@ export default class ListenButton extends Component {
     } else {
       console.debug("Playing audio in origin:", tts, text, lang);
 
-      const currentPageLanguage = this.getPageLanguage();
+      const currentPageLanguage = lang; //this.getPageLanguage();
 
       this.playAudioInBackgroundOrigin(text, currentPageLanguage);
     }
@@ -124,11 +152,14 @@ export default class ListenButton extends Component {
 
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
-    const currentPageLanguage = this.getPageLanguage();
+    const { voiceLang } = this.state;
+    // const currentPageLanguage = lang; //this.getPageLanguage();
+
     console.debug(
       "ListenButton.js -> Listen in Panel/Popup -> ",
       inPanel,
-      currentPageLanguage,
+      lang,
+      voiceLang,
       text
     );
 
@@ -136,7 +167,7 @@ export default class ListenButton extends Component {
       action: "listen",
       message: "listen",
       text: text,
-      sourceLang: currentPageLanguage,
+      sourceLang: voiceLang,
     });
     // this.ListenTTS("origin", text, lang);
     // this.ListenTTS("background", text, lang);
@@ -144,6 +175,7 @@ export default class ListenButton extends Component {
 
   render() {
     const { text, lang, inPanel } = this.props;
+    const { voiceLang } = this.state;
     const canListen = text && text.length < 200;
     if (!canListen) return null;
 
@@ -151,8 +183,9 @@ export default class ListenButton extends Component {
       <button
         className="listenButton"
         onClick={this.handleClick}
-        title={browser.i18n.getMessage("listenLabel") + " '" + text + "'"}
+        title={`${browser.i18n.getMessage("listenLabel")} ${voiceLang} ${text}`}
         style={inPanel ? { marginRight: "5px", marginTop: "2px" } : {}}
+        lang={lang}
       >
         <SpeakerIcon />
       </button>

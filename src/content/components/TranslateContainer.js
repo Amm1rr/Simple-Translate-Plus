@@ -6,13 +6,32 @@ import TranslatePanel from "./TranslatePanel";
 import "../styles/TranslateContainer.scss";
 
 const translateText = async (text, targetLang = getSettings("targetLang")) => {
-  const result = await browser.runtime.sendMessage({
-    message: "translate",
-    text: text,
-    sourceLang: "auto",
-    targetLang: targetLang,
+  try {
+    const result = await browser.runtime.sendMessage({
+      message: "translate",
+      text: text,
+      sourceLang: "auto",
+      targetLang: targetLang,
+    });
+    return result;
+  } catch (error) {
+    console.error("Error sending message:", error);
+    return {
+      isError: true,
+      errorMessage: "Failed to send message to background script",
+    };
+  }
+};
+
+const detectLang = async (selectedText) => {
+  const langInfo = await browser.i18n.detectLanguage(selectedText);
+
+  langInfo.languages.forEach((lang) => {
+    console.debug(
+      `${selectedText} ${langInfo.isReliable} ${lang.language} ${lang.percentage}`
+    );
   });
-  return result;
+  return langInfo.languages?.[0]?.language;
 };
 
 const matchesTargetLang = async (selectedText) => {
@@ -107,6 +126,10 @@ export default class TranslateContainer extends Component {
     if (shouldSwitchSecondLang)
       result = await translateText(this.selectedText, secondLang);
 
+    const LangDetect =
+      (await detectLang(this.selectedText)) ||
+      (shouldSwitchSecondLang ? secondLang : targetLang);
+
     this.setState({
       shouldShowPanel: true,
       panelPosition: panelPosition,
@@ -114,7 +137,7 @@ export default class TranslateContainer extends Component {
       candidateText: getSettings("ifShowCandidate") ? result.candidateText : "",
       isError: result.isError,
       errorMessage: result.errorMessage,
-      currentLang: shouldSwitchSecondLang ? secondLang : targetLang,
+      currentLang: LangDetect,
     });
   };
 

@@ -134,7 +134,18 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
       .join("");
   }
 
-  await autoplayPronunciation(word, sourceLang, listen);
+  await autoplayPronunciation(word, resultData.sourceLanguage, listen);
+
+  // Send the language of text to the ListenButton component
+  browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (tabs[0]) {
+      browser.tabs.sendMessage(tabs[0].id, {
+        action: "VoiceLanguage",
+        text: word,
+        voiceLang: resultData.sourceLanguage,
+      });
+    }
+  });
 
   log.log(logDir, "sendRequest()", resultData);
 
