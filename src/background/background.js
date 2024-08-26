@@ -45,6 +45,15 @@ if (browser.webNavigation) {
 export async function fetchAndListen(text, sourceLang = "en") {
   try {
     // console.debug("fetchAndListen : ", sourceLang, text);
+
+    // containsMoreThanTwoSpaces checks if a sentence contains more than two spaces.
+    if (text.split(" ").length > 5) {
+      console.info(
+        "Tip: Use sentences with 6+ words in popup for optimal performance."
+      );
+      return;
+    }
+
     if (sourceLang == "auto") {
       sourceLang = "en";
     }

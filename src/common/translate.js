@@ -60,6 +60,11 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
     autoPlay = getSettings("ifautoPlayListen");
   }
 
+  // containsMoreThanTwoSpaces checks if a sentence contains more than two spaces.
+  if (word.split(" ").length > 2) {
+    autoPlay = false;
+  }
+
   if (autoPlay == true) {
     log.log(logDir, "autoPlayListen() ON : ", word);
 
