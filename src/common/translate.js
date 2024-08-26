@@ -62,7 +62,6 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
 
   if (autoPlay == true) {
     log.log(logDir, "autoPlayListen() ON : ", word);
-    console.debug("autoPlayListen() ON : ", word);
 
     // browser.runtime.sendMessage({
     //   action: "listen",
@@ -78,7 +77,7 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
     const cachedAudio = await getAudioFromCache(word, sourceLang);
 
     if (cachedAudio) {
-      console.log("Play cached audio");
+      // console.log("Play cached audio");
       await playAudioFromCache(cachedAudio);
       return;
     }
@@ -92,7 +91,7 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
       const audioData = await response.arrayBuffer();
 
       await setAudioInCache(word, sourceLang, audioData);
-      console.log(`Play audio translate.js.`);
+      // console.log(`Play audio translate.js.`);
       await playAudioFromCache(audioData);
     } catch (error) {
       console.debug(

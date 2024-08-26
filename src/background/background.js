@@ -44,7 +44,7 @@ if (browser.webNavigation) {
 
 export async function fetchAndListen(text, sourceLang = "en") {
   try {
-    console.debug("fetchAndListen : ", sourceLang, text);
+    // console.debug("fetchAndListen : ", sourceLang, text);
     if (sourceLang == "auto") {
       sourceLang = "en";
     }
@@ -52,7 +52,7 @@ export async function fetchAndListen(text, sourceLang = "en") {
     const cachedAudio = await getAudioFromCache(text, sourceLang);
 
     if (cachedAudio) {
-      console.log(`Audio already in cache`);
+      // console.debug(`Audio already in cache`);
       await playAudioFromCache(cachedAudio);
       return;
     }
@@ -65,10 +65,9 @@ export async function fetchAndListen(text, sourceLang = "en") {
     const audioBlob = await response.blob();
 
     await setAudioInCache(text, sourceLang, audioBlob);
-    console.log(`Play audio background.js`);
     await playAudioFromCache(audioBlob);
   } catch (error) {
-    console.error("Error:", error);
+    console.error("background.js -> Error:", error);
   }
 }
 

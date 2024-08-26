@@ -83,7 +83,7 @@ export default class ListenButton extends Component {
       await setAudioInCache(text, lang, audioData);
       await playAudioFromCache(audioData);
     } catch (error) {
-      console.debug("Error playing audio in playAudioInBackground:", error);
+      // console.debug("Error playing audio in playAudioInBackground:", error);
     }
   };
 
@@ -100,7 +100,7 @@ export default class ListenButton extends Component {
     )}&lang=${lang}`;
 
     try {
-      console.debug("Generated Google TTS URL:", url);
+      // console.debug("Generated Google TTS URL:", url);
       const response = await fetch(url);
       const audioData = await response.arrayBuffer();
 
@@ -154,12 +154,12 @@ export default class ListenButton extends Component {
     const { tts } = services;
     if (tts == "google") {
       await this.playAudio(text, lang);
-      console.debug("Playing audio:", text);
+      // console.debug("Playing audio:", text);
     } else if (tts == "background") {
-      console.debug("Playing audio in background:", text);
+      // console.debug("Playing audio in background:", text);
       await this.playAudioInBackground(text, lang);
     } else {
-      console.debug("Playing audio in origin:", tts, text, lang);
+      // console.debug("Playing audio in origin:", tts, text, lang);
       const currentPageLanguage = lang;
       this.playAudioInBackgroundOrigin(text, currentPageLanguage);
     }

@@ -108,7 +108,7 @@ export default class TranslateContainer extends Component {
   };
 
   showPanel = async (clickedPosition = null) => {
-    console.debug("showPanel");
+    // console.debug("showPanel");
     const panelReferencePoint = getSettings("panelReferencePoint");
     const useClickedPosition =
       panelReferencePoint === "clickedPoint" && clickedPosition !== null;
