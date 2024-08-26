@@ -27,10 +27,17 @@ Edge version: https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiak
 
 ## Features
 
-New features added to **Google Tranlate Plus** :
+New features added to **Simple Translate Plus**:
 
 - **New "Listen" Button:** Added a "Listen" button in the translation panel, allowing users to hear the translated text.
 - **Autoplay Pronunciation:** Implemented autoplay for pronunciation, which automatically plays the translation's pronunciation after the translation is generated.
+- **Cache Mechanism:** Added a cache mechanism for TTS files played, improving performance and reducing server load.
+
+Additional features:
+
+- Provides text-to-speech functionality for word pronunciation
+- Supports multiple languages
+- Lightweight and efficient
 
 ## Sponsors
 
