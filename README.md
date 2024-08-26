@@ -36,7 +36,7 @@ New features added to **Simple Translate Plus**:
 Additional features:
 
 - Provides text-to-speech functionality for word pronunciation
-- Supports multiple languages
+- Supports pronunciation playback for multiple languages on any web page
 - Lightweight and efficient
 
 ## Sponsors
