@@ -10,6 +10,11 @@ import {
 } from "./menus";
 import { onCommandListener } from "./keyboardShortcuts";
 import onMessageListener from "./onMessageListener";
+import {
+  getAudioFromCache,
+  setAudioInCache,
+  playAudioFromCache,
+} from "../common/audioCache";
 
 const logDir = "background/background";
 
@@ -43,17 +48,35 @@ export async function fetchAndListen(text, sourceLang = "en") {
     if (sourceLang == "auto") {
       sourceLang = "en";
     }
+
+    const cachedAudio = await getAudioFromCache(text, sourceLang);
+
+    if (cachedAudio) {
+      console.log(`Audio already in cache`);
+      await playAudioFromCache(cachedAudio);
+      return;
+    }
+
     const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
       text
     )}&tl=${sourceLang}&samesite=none;secure`;
+
     const response = await fetch(url);
     const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
-    audio.play();
+
+    await setAudioInCache(text, sourceLang, audioBlob);
+    console.log(`Play audio background.js`);
+    await playAudioFromCache(audioBlob);
   } catch (error) {
     console.error("Error:", error);
   }
+}
+
+// Helper function to play audio
+function playAudio(audioBlob) {
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const audio = new Audio(audioUrl);
+  audio.play();
 }
 
 const init = async () => {

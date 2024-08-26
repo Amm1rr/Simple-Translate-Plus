@@ -4,6 +4,11 @@ import log from "loglevel";
 import SpeakerIcon from "../icons/speaker.svg";
 import "../styles/ListenButton.scss";
 import { LOCAL_TTS_SERVER } from "../../common/local_tts_server";
+import {
+  getAudioFromCache,
+  setAudioInCache,
+  playAudioFromCache,
+} from "../../common/audioCache";
 
 const logDir = "popup/AudioButton";
 
@@ -12,12 +17,14 @@ export default class ListenButton extends Component {
     super(props);
     this.state = {
       voiceLang: props.initialVoiceLang || "en",
+      audioCache: new Map(),
     };
+    this.audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
   }
 
   updateVoiceLang = (e) => {
     this.setState({ voiceLang: e.voiceLang });
-    // console.debug("ListenButton.js -> updateVoiceLang -> State", this.state);
   };
 
   componentDidMount() {
@@ -37,7 +44,6 @@ export default class ListenButton extends Component {
   }
 
   handleMessage = (message) => {
-    // console.debug("ListenButton.js -> handleMessage", message);
     if (message.action == "VoiceLanguage") {
       this.updateVoiceLang(message);
     }
@@ -59,6 +65,13 @@ export default class ListenButton extends Component {
   };
 
   playAudioInBackground = async (text, lang) => {
+    const cachedAudio = await getAudioFromCache(text, lang);
+
+    if (cachedAudio) {
+      await playAudioFromCache(cachedAudio);
+      return;
+    }
+
     const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
       text
     )}&tl=${lang}`;
@@ -67,19 +80,21 @@ export default class ListenButton extends Component {
       const response = await fetch(url);
       const audioData = await response.arrayBuffer();
 
-      const audioContext = new AudioContext();
-      const audioBuffer = await audioContext.decodeAudioData(audioData);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
+      await setAudioInCache(text, lang, audioData);
+      await playAudioFromCache(audioData);
     } catch (error) {
       console.debug("Error playing audio in playAudioInBackground:", error);
     }
   };
 
   playAudioInBackgroundOrigin = async (text, lang) => {
+    const cachedAudio = await getAudioFromCache(text, lang);
+
+    if (cachedAudio) {
+      await playAudioFromCache(cachedAudio);
+      return;
+    }
+
     const url = `${LOCAL_TTS_SERVER}/translate_tts?text=${encodeURIComponent(
       text
     )}&lang=${lang}`;
@@ -89,19 +104,21 @@ export default class ListenButton extends Component {
       const response = await fetch(url);
       const audioData = await response.arrayBuffer();
 
-      const audioContext = new AudioContext();
-      const audioBuffer = await audioContext.decodeAudioData(audioData);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
+      await setAudioInCache(text, lang, audioData);
+      await playAudioFromCache(audioData);
     } catch (error) {
       console.debug(
         "Error playing audio in playAudioInBackgroundOrigin:",
         error
       );
     }
+  };
+
+  playAudioBuffer = (audioBuffer) => {
+    const sourceNode = this.audioContext.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+    sourceNode.connect(this.audioContext.destination);
+    sourceNode.start(0);
   };
 
   getPageLanguage = () => {
@@ -136,16 +153,14 @@ export default class ListenButton extends Component {
   ListenTTS = async (services = "origin", text, lang) => {
     const { tts } = services;
     if (tts == "google") {
-      await playAudio(text, lang);
+      await this.playAudio(text, lang);
       console.debug("Playing audio:", text);
     } else if (tts == "background") {
       console.debug("Playing audio in background:", text);
-      await playAudioInBackground(text, lang);
+      await this.playAudioInBackground(text, lang);
     } else {
       console.debug("Playing audio in origin:", tts, text, lang);
-
-      const currentPageLanguage = lang; //this.getPageLanguage();
-
+      const currentPageLanguage = lang;
       this.playAudioInBackgroundOrigin(text, currentPageLanguage);
     }
   };
@@ -153,24 +168,16 @@ export default class ListenButton extends Component {
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
-    // const currentPageLanguage = lang; //this.getPageLanguage();
-
-    console.debug(
-      "ListenButton.js -> Listen in Panel/Popup -> ",
-      inPanel,
-      lang,
-      voiceLang,
-      text
-    );
-
     browser.runtime.sendMessage({
       action: "listen",
       message: "listen",
       text: text,
       sourceLang: voiceLang,
     });
-    // this.ListenTTS("origin", text, lang);
-    // this.ListenTTS("background", text, lang);
+
+    // Uncomment one of these lines to use the local caching mechanism
+    // this.ListenTTS("origin", text, voiceLang);
+    // this.ListenTTS("background", text, voiceLang);
   };
 
   render() {

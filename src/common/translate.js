@@ -2,8 +2,16 @@ import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
 // import ListenButton from "../popup/components/ListenButton";
+import {
+  getAudioFromCache,
+  setAudioInCache,
+  playAudioFromCache,
+} from "./audioCache";
 
 const logDir = "common/translate";
+
+// Create a Map to store the audio cache
+const audioCache = new Map();
 
 const getHistory = async (
   sourceWord,
@@ -33,6 +41,15 @@ const setHistory = async (
   });
 };
 
+// Helper function to play audio
+const playAudio = (audioBuffer) => {
+  const audioContext = new AudioContext();
+  const sourceNode = audioContext.createBufferSource();
+  sourceNode.buffer = audioBuffer;
+  sourceNode.connect(audioContext.destination);
+  sourceNode.start(0);
+};
+
 const autoplayPronunciation = async (word, sourceLang, listen) => {
   let autoPlay;
   if (listen == true) {
@@ -58,6 +75,14 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
       sourceLang = "en";
     }
 
+    const cachedAudio = await getAudioFromCache(word, sourceLang);
+
+    if (cachedAudio) {
+      console.log("Play cached audio");
+      await playAudioFromCache(cachedAudio);
+      return;
+    }
+
     const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
       word
     )}&tl=${sourceLang}&samesite=none;secure`;
@@ -66,13 +91,9 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
       const response = await fetch(url);
       const audioData = await response.arrayBuffer();
 
-      const audioContext = new AudioContext();
-      const audioBuffer = await audioContext.decodeAudioData(audioData);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
+      await setAudioInCache(word, sourceLang, audioData);
+      console.log(`Play audio translate.js.`);
+      await playAudioFromCache(audioData);
     } catch (error) {
       console.debug(
         "Error auto playing audio in playAudioInBackground:",
