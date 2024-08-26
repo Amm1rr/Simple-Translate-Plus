@@ -168,6 +168,15 @@ export default class ListenButton extends Component {
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
+
+    // Skip TTS for short phrases in the popup panel to improve performance
+    if (inPanel && text.split(/\s+/).length > 5) {
+      console.info(
+        "Simple Translate+ Tip: Use sentences with 5+ words in popup panel for optimal performance."
+      );
+      return;
+    }
+
     browser.runtime.sendMessage({
       action: "listen",
       message: "listen",
