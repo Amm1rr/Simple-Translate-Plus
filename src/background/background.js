@@ -2,6 +2,11 @@ import browser from "webextension-polyfill";
 import log from "loglevel";
 import { initSettings, handleSettingsChange } from "src/settings/settings";
 import { updateLogLevel, overWriteLogLevel } from "src/common/log";
+import {
+  getAudioFromCache,
+  setAudioInCache,
+  playAudioFromCache,
+} from "../common/audioCache";
 import onInstalledListener from "./onInstalledListener";
 import {
   showMenus,
@@ -10,11 +15,6 @@ import {
 } from "./menus";
 import { onCommandListener } from "./keyboardShortcuts";
 import onMessageListener from "./onMessageListener";
-import {
-  getAudioFromCache,
-  setAudioInCache,
-  playAudioFromCache,
-} from "../common/audioCache";
 
 const logDir = "background/background";
 
@@ -44,24 +44,10 @@ if (browser.webNavigation) {
 
 export async function fetchAndListen(text, sourceLang = "en") {
   try {
-    // console.debug("fetchAndListen : ", sourceLang, text);
-
-    // containsMoreThanTwoSpaces checks if a sentence contains more than two spaces.
-    if (text.split(" ").length > 5) {
-      console.info(
-        "Tip: Use sentences with 6+ words in popup for optimal performance."
-      );
-      return;
-    }
-
-    if (sourceLang == "auto") {
-      sourceLang = "en";
-    }
+    sourceLang = sourceLang === "auto" ? "en" : sourceLang;
 
     const cachedAudio = await getAudioFromCache(text, sourceLang);
-
     if (cachedAudio) {
-      // console.debug(`Audio already in cache`);
       await playAudioFromCache(cachedAudio);
       return;
     }
@@ -69,7 +55,6 @@ export async function fetchAndListen(text, sourceLang = "en") {
     const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
       text
     )}&tl=${sourceLang}&samesite=none;secure`;
-
     const response = await fetch(url);
     const audioBlob = await response.blob();
 
@@ -80,18 +65,10 @@ export async function fetchAndListen(text, sourceLang = "en") {
   }
 }
 
-// Helper function to play audio
-function playAudio(audioBlob) {
-  const audioUrl = URL.createObjectURL(audioBlob);
-  const audio = new Audio(audioUrl);
-  audio.play();
-}
-
 const init = async () => {
-  await initSettings();
-  overWriteLogLevel();
-  updateLogLevel();
+  await Promise.all([initSettings(), overWriteLogLevel(), updateLogLevel()]);
   log.info(logDir, "init()");
   showMenus();
 };
+
 init();
