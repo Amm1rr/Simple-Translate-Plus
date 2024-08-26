@@ -26,11 +26,12 @@ const translateText = async (text, targetLang = getSettings("targetLang")) => {
 const detectLang = async (selectedText) => {
   const langInfo = await browser.i18n.detectLanguage(selectedText);
 
-  langInfo.languages.forEach((lang) => {
-    console.debug(
-      `${selectedText} ${langInfo.isReliable} ${lang.language} ${lang.percentage}`
-    );
-  });
+  // langInfo.languages.forEach((lang) => {
+  //   console.debug(
+  //     `${selectedText} ${langInfo.isReliable} ${lang.language} ${lang.percentage}`
+  //   );
+  // });
+
   return langInfo.languages?.[0]?.language;
 };
 
