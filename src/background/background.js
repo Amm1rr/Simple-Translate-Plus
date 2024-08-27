@@ -43,11 +43,13 @@ if (browser.webNavigation) {
 }
 
 export async function fetchAndListen(text, sourceLang = "en") {
+  log.debug(logDir, "fetchAndListen called", { text, sourceLang });
   try {
     sourceLang = sourceLang === "auto" ? "en" : sourceLang;
 
     const cachedAudio = await getAudioFromCache(text, sourceLang);
     if (cachedAudio) {
+      log.debug(logDir, "Using cached audio");
       return playAudioFromCache(cachedAudio);
     }
 
@@ -58,6 +60,7 @@ export async function fetchAndListen(text, sourceLang = "en") {
     url.searchParams.set("samesite", "none");
     url.searchParams.set("secure", "");
 
+    log.debug(logDir, "Fetching audio from URL", url.toString());
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -71,7 +74,8 @@ export async function fetchAndListen(text, sourceLang = "en") {
       const errorKey = errorMessages[response.status] || "unknownError";
       const errorMessage = browser.i18n.getMessage(errorKey);
 
-      console.debug(
+      log.warn(
+        logDir,
         errorKey === "ttsLanguageUnavailable"
           ? `${errorMessage} (${
               sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
@@ -84,28 +88,33 @@ export async function fetchAndListen(text, sourceLang = "en") {
 
     const contentType = response.headers.get("content-type");
     if (!contentType?.includes("audio/")) {
-      console.error("The response is not an audio file.");
+      log.error(logDir, "The response is not an audio file.");
       return false;
     }
 
     const audioBlob = await response.blob();
     if (audioBlob.size === 0) {
-      console.error("Received empty audio file.");
+      log.error(logDir, "Received empty audio file.");
       return false;
     }
 
+    log.debug(logDir, "Audio fetched successfully, caching and playing");
     await setAudioInCache(text, sourceLang, audioBlob);
     return playAudioFromCache(audioBlob);
   } catch (error) {
-    console.error("fetchAndListen error:", error);
+    log.error(logDir, "fetchAndListen error:", error);
     // Consider implementing user-friendly error handling here
   }
 }
 
 const init = async () => {
-  await Promise.all([initSettings(), overWriteLogLevel(), updateLogLevel()]);
-  log.info(logDir, "init()");
-  showMenus();
+  try {
+    await Promise.all([initSettings(), overWriteLogLevel(), updateLogLevel()]);
+    log.info(logDir, "Initialization complete");
+    showMenus();
+  } catch (error) {
+    log.error(logDir, "Initialization failed:", error);
+  }
 };
 
 init();
