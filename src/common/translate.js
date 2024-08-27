@@ -1,14 +1,16 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
-// import ListenButton from "../popup/components/ListenButton";
-import {
-  getAudioFromCache,
-  setAudioInCache,
-  playAudioFromCache,
-} from "./audioCache";
+import { getAudioFromCache, playAudioFromCache } from "./audioCache";
 
 const logDir = "common/translate";
+
+// Set the log level for this module (you can adjust this as needed)
+log.setLevel(log.levels.DEBUG);
+
+const getCacheKey = (sourceWord, sourceLang, targetLang, translationApi) => {
+  return `${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`;
+};
 
 const getHistory = async (
   sourceWord,
@@ -16,13 +18,22 @@ const getHistory = async (
   targetLang,
   translationApi
 ) => {
-  const result = await browser.storage.session.get(
-    `${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`
+  const cacheKey = getCacheKey(
+    sourceWord,
+    sourceLang,
+    targetLang,
+    translationApi
   );
-  return (
-    result[`${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`] ??
-    false
+  const result = await browser.storage.session.get(cacheKey);
+  const cachedResult = result[cacheKey] || false;
+  log.debug(
+    logDir,
+    "Checking cache for key:",
+    cacheKey,
+    "Result:",
+    cachedResult
   );
+  return cachedResult;
 };
 
 const setHistory = async (
@@ -33,14 +44,19 @@ const setHistory = async (
   result
 ) => {
   if (result.isError) return;
-  await browser.storage.session.set({
-    [`${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`]: result,
-  });
+  const cacheKey = getCacheKey(
+    sourceWord,
+    sourceLang,
+    targetLang,
+    translationApi
+  );
+  await browser.storage.session.set({ [cacheKey]: result });
+  log.debug(logDir, "Set cache for key:", cacheKey);
 };
 
 const autoplayPronunciation = async (word, sourceLang, listen) => {
   let autoPlay;
-  if (listen == true) {
+  if (listen === true) {
     autoPlay = true;
   } else if (listen === false) {
     autoPlay = false;
@@ -48,29 +64,19 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
     autoPlay = getSettings("ifautoPlayListen");
   }
 
-  // containsMoreThanTwoSpaces checks if a sentence contains more than two spaces.
   if (word.split(" ").length > 2) {
     autoPlay = false;
   }
 
-  if (autoPlay == true) {
-    log.log(logDir, "autoPlayListen() ON : ", word);
-
-    // browser.runtime.sendMessage({
-    //   action: "listen",
-    //   message: "listen",
-    //   text: word,
-    //   sourceLang: sourceLang,
-    // });
-
-    if (sourceLang == "auto") {
+  if (autoPlay === true) {
+    if (sourceLang === "auto") {
       sourceLang = "en";
     }
 
     const cachedAudio = await getAudioFromCache(word, sourceLang);
 
     if (cachedAudio) {
-      // console.log("Play cached audio");
+      log.debug(logDir, "Playing cached audio");
       await playAudioFromCache(cachedAudio);
       return;
     }
@@ -95,7 +101,8 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
       const errorKey = errorMessages[response.status] || "unknownError";
       const errorMessage = browser.i18n.getMessage(errorKey);
 
-      console.debug(
+      log.warn(
+        logDir,
         errorKey === "ttsLanguageUnavailable"
           ? `${errorMessage} (${
               sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
@@ -108,13 +115,13 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
 
     const contentType = response.headers.get("content-type");
     if (!contentType?.includes("audio/")) {
-      console.error("The response is not an audio file.");
+      log.error(logDir, "The response is not an audio file.");
       return false;
     }
 
     const audioBlob = await response.blob();
     if (audioBlob.size === 0) {
-      console.error("Received empty audio file.");
+      log.error(logDir, "Received empty audio file.");
       return false;
     }
   }
@@ -136,6 +143,7 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
     percentage: 0,
     isError: false,
     errorMessage: "",
+    voiceLang: "",
   };
 
   if (response.status !== 200) {
@@ -150,13 +158,14 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
         response.status
       } ${response.statusText}]`;
 
-    log.error(logDir, "sendRequest()", response);
+    log.error(logDir, "sendRequestToGoogle() error:", resultData.errorMessage);
     return resultData;
   }
 
   const result = await response.json();
 
   resultData.sourceLanguage = result.src;
+  resultData.voiceLang = result.src;
   resultData.percentage = result.ld_result.srclangs_confidences[0];
   resultData.resultText = result.sentences
     .map((sentence) => sentence.trans)
@@ -165,27 +174,14 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
     resultData.candidateText = result.dict
       .map(
         (dict) =>
-          `${dict.pos}${dict.pos != "" ? ": " : ""}${
+          `${dict.pos}${dict.pos !== "" ? ": " : ""}${
             dict.terms !== undefined ? dict.terms.join(", ") : ""
           }\n`
       )
       .join("");
   }
 
-  await autoplayPronunciation(word, resultData.sourceLanguage, listen);
-
-  // Send the language of text to the ListenButton component
-  browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    if (tabs[0]) {
-      browser.tabs.sendMessage(tabs[0].id, {
-        action: "VoiceLanguage",
-        text: word,
-        voiceLang: resultData.sourceLanguage,
-      });
-    }
-  });
-
-  log.log(logDir, "sendRequest()", resultData);
+  log.debug(logDir, "sendRequestToGoogle() result:", resultData);
 
   return resultData;
 };
@@ -242,8 +238,28 @@ const sendRequestToDeepL = async (word, sourceLang, targetLang) => {
   return resultData;
 };
 
+const updateVoiceLanguage = async (word, sourceLang) => {
+  log.debug(logDir, "Updating Voice Language:", sourceLang);
+  await autoplayPronunciation(word, sourceLang);
+
+  browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (tabs[0]) {
+      browser.tabs.sendMessage(tabs[0].id, {
+        action: "VoiceLanguage",
+        text: word,
+        voiceLang: sourceLang,
+      });
+    }
+  });
+};
+
 export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
-  log.log(logDir, "translate()", sourceWord, targetLang);
+  log.debug(logDir, "translate()", {
+    sourceWord,
+    sourceLang,
+    targetLang,
+    listen,
+  });
   sourceWord = sourceWord.trim();
   if (sourceWord === "")
     return {
@@ -262,12 +278,21 @@ export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
     targetLang,
     translationApi
   );
-  if (cachedResult) return cachedResult;
+  if (cachedResult) {
+    log.info(logDir, "Cached result found:", cachedResult);
+    await updateVoiceLanguage(sourceWord, cachedResult.sourceLanguage);
+    return cachedResult;
+  }
 
   const result =
     translationApi === "google"
       ? await sendRequestToGoogle(sourceWord, sourceLang, targetLang, listen)
       : await sendRequestToDeepL(sourceWord, sourceLang, targetLang);
+
+  result.voiceLang = result.sourceLanguage;
+
+  await updateVoiceLanguage(sourceWord, result.sourceLanguage);
+
   setHistory(sourceWord, sourceLang, targetLang, translationApi, result);
   return result;
 };
