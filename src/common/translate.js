@@ -10,9 +10,6 @@ import {
 
 const logDir = "common/translate";
 
-// Create a Map to store the audio cache
-const audioCache = new Map();
-
 const getHistory = async (
   sourceWord,
   sourceLang,
@@ -39,15 +36,6 @@ const setHistory = async (
   await browser.storage.session.set({
     [`${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`]: result,
   });
-};
-
-// Helper function to play audio
-const playAudio = (audioBuffer) => {
-  const audioContext = new AudioContext();
-  const sourceNode = audioContext.createBufferSource();
-  sourceNode.buffer = audioBuffer;
-  sourceNode.connect(audioContext.destination);
-  sourceNode.start(0);
 };
 
 const autoplayPronunciation = async (word, sourceLang, listen) => {
@@ -87,22 +75,47 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
       return;
     }
 
-    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-      word
-    )}&tl=${sourceLang}&samesite=none;secure`;
+    const url = new URL("https://translate.google.com/translate_tts");
+    url.searchParams.set("client", "tw-ob");
+    url.searchParams.set("q", word);
+    url.searchParams.set("tl", sourceLang);
+    url.searchParams.set("samesite", "none");
+    url.searchParams.set("secure", "");
 
-    try {
-      const response = await fetch(url);
-      const audioData = await response.arrayBuffer();
+    const response = await fetch(url);
 
-      await setAudioInCache(word, sourceLang, audioData);
-      // console.log(`Play audio translate.js.`);
-      await playAudioFromCache(audioData);
-    } catch (error) {
+    if (!response.ok) {
+      const errorMessages = {
+        0: "networkError",
+        400: "ttsLanguageUnavailable",
+        429: "unavailableError",
+        503: "unavailableError",
+      };
+
+      const errorKey = errorMessages[response.status] || "unknownError";
+      const errorMessage = browser.i18n.getMessage(errorKey);
+
       console.debug(
-        "Error auto playing audio in playAudioInBackground:",
-        error
+        errorKey === "ttsLanguageUnavailable"
+          ? `${errorMessage} (${
+              sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
+            })`
+          : `${errorMessage} [${response.status} ${response.statusText}]`
       );
+
+      return false;
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("audio/")) {
+      console.error("The response is not an audio file.");
+      return false;
+    }
+
+    const audioBlob = await response.blob();
+    if (audioBlob.size === 0) {
+      console.error("Received empty audio file.");
+      return false;
     }
   }
 };
