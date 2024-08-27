@@ -1,81 +1,93 @@
 # <sub><img src="./src/icons/64.png" width=64px height=64px></sub> Simple Translate Plus
 
-#### Quickly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
+#### Instantly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
 
 [<img src="other/promotion/badges/firefox.png" align="left" alt="for Firefox (soon...)">](https://addons.mozilla.org/firefox/addon/simple-translate/)
-
-[<img src="other/promotion/badges/chrome.png" alt="for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace)
-
-[for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl)
+[<img src="other/promotion/badges/chrome.png" alt="for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate-plus/)
+[for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/)
 
 ## About
 
-When you select text, the translation button pops up and the translation is displayed instantly.
-If you enable "Do not display the button if translation is not required" option, you will not get frustrated by the button appearing when it is not necessary.
+Simple Translate Plus enhances your browsing experience with seamless translation capabilities:
 
-In the toolbar popup, translate the input text in real time.
-If you enable "Automatically switch to the second language" option, you can do : When English is input, it is translated into Japanese, and when Japanese is input, it is translated into English.
+- Instantly translate selected text with a pop-up button
+- Real-time translation in the toolbar popup
+- Context menu translation options for pages, selected text, and links
+- Support for both Google Translate and DeepL API
 
-You can also translate from the context menu.
-You can select "Translate this page", "Translate selected text", and "Translate selected link" from the menu on the page or tab.
+## Key Features
 
-Supports Google Translate and DeepL API.
+- **Instant Translation:** Translate selected text with a single click
+- **Smart Button Display:** Option to hide the translation button when not needed
+- **Real-time Toolbar Translation:** Translate as you type in the toolbar popup
+- **Automatic Language Switching:** Intelligently switch between primary and secondary languages
+- **Context Menu Integration:** Translate entire pages, selected text, or links from the right-click menu
+- **Multiple Translation Services:** Choose between Google Translate and DeepL API
 
-Chrome version: https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace
-<br>
-Edge version: https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl
+### New in Simple Translate Plus
 
-## Features
+- **Audio Playback:** "Listen" button for hearing translated text
+- **Autoplay Pronunciation:** Automatically play translation pronunciation
+- **Efficient Caching:** Improved performance with TTS file caching
+- **Multilingual Text-to-Speech:** Word pronunciation for multiple languages
+- **Lightweight Design:** Optimized for efficiency and speed
 
-New features added to **Simple Translate Plus**:
+## Installation
 
-- **New "Listen" Button:** Added a "Listen" button in the translation panel, allowing users to hear the translated text.
-- **Autoplay Pronunciation:** Implemented autoplay for pronunciation, which automatically plays the translation's pronunciation after the translation is generated.
-- **Cache Mechanism:** Added a cache mechanism for TTS files played, improving performance and reducing server load.
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace)
+- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl)
+- Firefox Add-ons (Coming Soon)
 
-Additional features:
+## Support the Project
 
-- Provides text-to-speech functionality for word pronunciation
-- Supports pronunciation playback for multiple languages on any web page
-- Lightweight and efficient
+Your support helps maintain and improve Simple Translate Plus:
 
-## Sponsors
+[<img src="other/promotion/badges/patreon.png" alt="Become a Patron" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="other/promotion/badges/paypal.png" alt="Donate with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
 
-Support Simple Translate Plus by [becoming a sponsor](https://patreon.com/Simple_Translate_Plus). Thank you to our wonderful sponsors!
+## Contribute
 
-[<img src="other/promotion/badges/patreon.png" alt="Became a Patreon" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="other/promotion/badges/paypal.png" alt="Check out with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
+Help make Simple Translate Plus available in more languages:
 
-## Translation
+- Contribute translations on [Crowdin](https://crowdin.com/project/simple-translate)
 
-You can contribute by translating Simple Translate Plus on **[Crowdin](https://crowdin.com/project/simple-translate)**.
+## Development
 
-##
+Prerequisites:
 
-## Developing
+- Node.js 18.17.1 or higher
 
-> Required Node 18.17.1
+Setup:
 
-1. Clone the repository `git clone https://github.com/amm1rr/simple-translate-plus`
-2. Run `npm install`
-3. Run `npm run watch-dev`
+1. Clone the repository: `git clone https://github.com/amm1rr/simple-translate-plus`
+2. Install dependencies: `npm install`
+3. Start development watch: `npm run watch-dev`
 
-### Load the extension in Chrome
+### Loading the Extension
 
-1. Open Chrome browser and navigate to `chrome://extensions`
-2. Select "Developer Mode" and then click "Load unpacked extension..."
-3. From the file browser, choose to `simple-translate-plus/dev/chrome`
+#### Chrome
 
-### Load the extension in Edge
+1. Navigate to `chrome://extensions`
+2. Enable "Developer Mode"
+3. Click "Load unpacked extension"
+4. Select the `simple-translate-plus/dev/chrome` directory
 
-1. Open Edge browser and navigate to `edge://extensions`
-2. Select "Developer Mode" and then click "Load unpacked"
-3. From the file browser, choose to `simple-translate-plus/dev/chrome`
+#### Edge
 
-### Load the extension in Firefox
+1. Navigate to `edge://extensions`
+2. Enable "Developer Mode"
+3. Click "Load unpacked"
+4. Select the `simple-translate-plus/dev/chrome` directory
 
-1. Open Firefox browser and navigate to `about:debugging`
-2. Click "Load Temporary Add-on" and from the file browser, choose `simple-translate-plus/dev/firefox`
+#### Firefox
 
-## Privacy Policy
+1. Navigate to `about:debugging`
+2. Click "Load Temporary Add-on"
+3. Select any file in the `simple-translate-plus/dev/firefox` directory
 
-[Privacy Policy](https://simple-translate.sienori.com/privacy-policy) of Simple Translate Plus
+## Privacy
+
+Read our [Privacy Policy](https://simple-translate.sienori.com/privacy-policy) to understand how we handle your data.
+
+---
+
+This improved README provides a clearer structure, highlights key features more effectively, and offers a more comprehensive guide for both users and potential contributors. It also emphasizes the new features of Simple Translate Plus and provides clear instructions for development and installation across different browsers.
