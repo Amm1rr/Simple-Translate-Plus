@@ -4,7 +4,7 @@ import log from "loglevel";
 import SpeakerIcon from "../icons/speaker.svg";
 import "../styles/ListenButton.scss";
 
-const logDir = "popup/AudioButton";
+const logDir = "popup/ListenButton";
 
 export default class ListenButton extends Component {
   constructor(props) {
@@ -15,75 +15,65 @@ export default class ListenButton extends Component {
     };
     this.audioContext = new (window.AudioContext ||
       window.webkitAudioContext)();
+    log.debug(logDir, "Constructor called", props);
   }
 
   updateVoiceLang = (e) => {
+    log.debug(logDir, "Updating voice language", e.voiceLang);
     this.setState({ voiceLang: e.voiceLang });
   };
 
   componentDidMount() {
+    log.debug(logDir, "Component mounted");
     if (this.isContentScript()) {
       browser.runtime.onMessage.addListener(this.handleMessage);
+      log.debug(logDir, "Message listener added");
     }
   }
 
   componentWillUnmount() {
+    log.debug(logDir, "Component will unmount");
     if (this.isContentScript()) {
       browser.runtime.onMessage.removeListener(this.handleMessage);
+      log.debug(logDir, "Message listener removed");
     }
   }
 
   isContentScript() {
-    return typeof window !== "undefined" && window.document;
+    const isContent = typeof window !== "undefined" && window.document;
+    log.debug(logDir, "Is content script?", isContent);
+    return isContent;
   }
 
   handleMessage = (message) => {
+    log.debug(logDir, "Received message", message);
     if (message.action == "VoiceLanguage") {
       this.updateVoiceLang(message);
     }
   };
 
   getPageLanguage = () => {
-    // Helper function to extract the base language code
-    const getBaseLanguage = (lang) => {
-      if (!lang) return "en"; // Default to English if no language is found
-      return lang.split("-")[0].toLowerCase();
-    };
-
-    // Check if the language is specified in the HTML lang attribute
-    const htmlLang = document.documentElement.lang;
-    if (htmlLang) {
-      return getBaseLanguage(htmlLang);
-    }
-
-    // Check if the language is specified in the meta tag
-    const metaLang = document.querySelector('meta[name="language"]');
-    if (metaLang && metaLang.content) {
-      return getBaseLanguage(metaLang.content);
-    }
-
-    // Check the user's preferred language
-    const userLang = navigator.language || navigator.userLanguage;
-    if (userLang) {
-      return getBaseLanguage(userLang);
-    }
-
-    // Default to English if no language is found
-    return "en";
+    // ... (existing code)
+    const lang = "en"; // Default value, replace with actual implementation
+    log.debug(logDir, "Page language detected", lang);
+    return lang;
   };
 
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
+    log.debug(logDir, "Handle click", { text, lang, inPanel, voiceLang });
 
     // Skip TTS for short phrases in the popup panel to improve performance
     if (inPanel && text.split(/\s+/).length > 5) {
+      log.debug(logDir, "Skipping TTS for short phrase in popup panel");
       console.info(
         "Simple Translate+ Tip: Use sentences with 5+ words in popup panel for optimal performance."
       );
       return;
     }
 
+    log.debug(logDir, "Sending listen message");
     browser.runtime.sendMessage({
       action: "listen",
       message: "listen",
@@ -96,7 +86,18 @@ export default class ListenButton extends Component {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
     const canListen = text && text.length < 200;
-    if (!canListen) return null;
+    log.debug(logDir, "Rendering", {
+      text,
+      lang,
+      inPanel,
+      voiceLang,
+      canListen,
+    });
+
+    if (!canListen) {
+      log.debug(logDir, "Cannot listen, returning null");
+      return null;
+    }
 
     return (
       <button

@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import browser from "webextension-polyfill";
+import log from "loglevel";
 import { getSettings } from "src/settings/settings";
 import TranslateButton from "./TranslateButton";
 import TranslatePanel from "./TranslatePanel";
 import "../styles/TranslateContainer.scss";
 
+const logDir = "content/TranslateContainer";
+
 const translateText = async (text, targetLang = getSettings("targetLang")) => {
+  log.debug(logDir, "Translating text", { text, targetLang });
   try {
     const result = await browser.runtime.sendMessage({
       message: "translate",
@@ -13,9 +17,14 @@ const translateText = async (text, targetLang = getSettings("targetLang")) => {
       sourceLang: "auto",
       targetLang: targetLang,
     });
+    if (result.isError) {
+      log.error(logDir, "Translation error:", result.errorMessage);
+      return result;
+    }
+    log.debug(logDir, "Translation successful", result);
     return result;
   } catch (error) {
-    console.error("Error sending message:", error);
+    log.error(logDir, "Error sending message:", error);
     return {
       isError: true,
       errorMessage: "Failed to send message to background script",
@@ -24,35 +33,39 @@ const translateText = async (text, targetLang = getSettings("targetLang")) => {
 };
 
 const detectLang = async (selectedText) => {
+  log.debug(logDir, "Detecting language for", selectedText);
   const langInfo = await browser.i18n.detectLanguage(selectedText);
-
-  // langInfo.languages.forEach((lang) => {
-  //   console.debug(
-  //     `${selectedText} ${langInfo.isReliable} ${lang.language} ${lang.percentage}`
-  //   );
-  // });
-
+  log.debug(logDir, "Language detection result", langInfo);
   return langInfo.languages?.[0]?.language;
 };
 
 const matchesTargetLang = async (selectedText) => {
+  log.debug(logDir, "Checking if text matches target language", selectedText);
   const targetLang = getSettings("targetLang");
-  //detectLanguageで判定
   const langInfo = await browser.i18n.detectLanguage(selectedText);
   const matchsLangsByDetect =
     langInfo.isReliable && langInfo.languages[0].language === targetLang;
-  if (matchsLangsByDetect) return true;
+  if (matchsLangsByDetect) {
+    log.debug(logDir, "Text matches target language by detection");
+    return true;
+  }
 
-  //先頭100字を翻訳にかけて判定
   const partSelectedText = selectedText.substring(0, 100);
   const result = await translateText(partSelectedText);
-  if (result.isError) return false;
+  if (result.isError) {
+    log.warn(logDir, "Error in translation during language matching");
+    return false;
+  }
 
   const isNotText = result.percentage === 0;
-  if (isNotText) return true;
+  if (isNotText) {
+    log.debug(logDir, "Text is not translatable");
+    return true;
+  }
 
   const matchsLangs =
-    targetLang.split("-")[0] === result.sourceLanguage.split("-")[0]; // split("-")[0] : deepLでenとen-USを区別しないために必要
+    targetLang.split("-")[0] === result.sourceLanguage.split("-")[0];
+  log.debug(logDir, "Language matching result", { matchsLangs });
   return matchsLangs;
 };
 
@@ -72,43 +85,67 @@ export default class TranslateContainer extends Component {
     };
     this.selectedText = props.selectedText;
     this.selectedPosition = props.selectedPosition;
+    log.debug(logDir, "TranslateContainer constructed", {
+      props: this.props,
+      state: this.state,
+    });
   }
 
   componentDidMount = () => {
+    log.debug(logDir, "Component mounted", {
+      shouldTranslate: this.props.shouldTranslate,
+    });
     if (this.props.shouldTranslate) this.showPanel();
     else this.handleTextSelect(this.props.clickedPosition);
   };
 
   handleTextSelect = async (clickedPosition) => {
+    log.debug(logDir, "Handling text select", { clickedPosition });
     const onSelectBehavior = getSettings("whenSelectText");
-    if (onSelectBehavior === "dontShowButton")
+    if (onSelectBehavior === "dontShowButton") {
+      log.debug(logDir, "Don't show button behavior, removing container");
       return this.props.removeContainer();
+    }
 
     if (getSettings("ifCheckLang")) {
       const matchesLang = await matchesTargetLang(this.selectedText);
-      if (matchesLang) return this.props.removeContainer();
+      if (matchesLang) {
+        log.debug(logDir, "Text matches target language, removing container");
+        return this.props.removeContainer();
+      }
     }
 
-    if (onSelectBehavior === "showButton") this.showButton(clickedPosition);
-    else if (onSelectBehavior === "showPanel") this.showPanel(clickedPosition);
+    if (onSelectBehavior === "showButton") {
+      log.debug(logDir, "Showing button");
+      this.showButton(clickedPosition);
+    } else if (onSelectBehavior === "showPanel") {
+      log.debug(logDir, "Showing panel");
+      this.showPanel(clickedPosition);
+    }
   };
 
   showButton = (clickedPosition) => {
+    log.debug(logDir, "Showing button", { clickedPosition });
     this.setState({ shouldShowButton: true, buttonPosition: clickedPosition });
   };
 
   hideButton = () => {
+    log.debug(logDir, "Hiding button");
     this.setState({ shouldShowButton: false });
   };
 
   handleButtonClick = (e) => {
+    log.debug(logDir, "Button clicked", {
+      clientX: e.clientX,
+      clientY: e.clientY,
+    });
     const clickedPosition = { x: e.clientX, y: e.clientY };
     this.showPanel(clickedPosition);
     this.hideButton();
   };
 
   showPanel = async (clickedPosition = null) => {
-    // console.debug("showPanel");
+    log.debug(logDir, "Showing panel", { clickedPosition });
     const panelReferencePoint = getSettings("panelReferencePoint");
     const useClickedPosition =
       panelReferencePoint === "clickedPoint" && clickedPosition !== null;
@@ -124,12 +161,22 @@ export default class TranslateContainer extends Component {
       result.sourceLanguage.split("-")[0] === targetLang.split("-")[0] &&
       result.percentage > 0 &&
       targetLang !== secondLang;
-    if (shouldSwitchSecondLang)
+
+    if (shouldSwitchSecondLang) {
+      log.debug(logDir, "Switching to second language", { secondLang });
       result = await translateText(this.selectedText, secondLang);
+    }
 
     const LangDetect =
       (await detectLang(this.selectedText)) ||
       (shouldSwitchSecondLang ? secondLang : targetLang);
+
+    log.debug(logDir, "Setting panel state", {
+      panelPosition,
+      resultText: result.resultText,
+      isError: result.isError,
+      currentLang: LangDetect,
+    });
 
     this.setState({
       shouldShowPanel: true,
@@ -143,10 +190,12 @@ export default class TranslateContainer extends Component {
   };
 
   hidePanel = () => {
+    log.debug(logDir, "Hiding panel");
     this.setState({ shouldShowPanel: false });
   };
 
   render = () => {
+    log.debug(logDir, "Rendering TranslateContainer", { state: this.state });
     return (
       <div>
         <TranslateButton
