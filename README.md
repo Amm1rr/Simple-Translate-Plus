@@ -26,7 +26,9 @@ Simple Translate Plus enhances your browsing experience with seamless translatio
 - **Context Menu Integration:** Translate entire pages, selected text, or links from the right-click menu
 - **Multiple Translation Services:** Choose between Google Translate and DeepL API
 
-##### New Additions in Simple Translate Plus
+<br>
+
+**_New Additions_** in Simple Translate Plus :
 
 - **Audio Playback:** "Listen" button for hearing translated text
 - **Autoplay Pronunciation:** Automatically play translation pronunciation
