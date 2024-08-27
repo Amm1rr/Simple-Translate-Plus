@@ -24,7 +24,7 @@ Simple Translate Plus enhances your browsing experience with seamless translatio
 - **Context Menu Integration:** Translate entire pages, selected text, or links from the right-click menu
 - **Multiple Translation Services:** Choose between Google Translate and DeepL API
 
-### New in Simple Translate Plus
+#### New in Simple Translate Plus
 
 - **Audio Playback:** "Listen" button for hearing translated text
 - **Autoplay Pronunciation:** Automatically play translation pronunciation
@@ -32,11 +32,11 @@ Simple Translate Plus enhances your browsing experience with seamless translatio
 - **Multilingual Text-to-Speech:** Word pronunciation for multiple languages
 - **Lightweight Design:** Optimized for efficiency and speed
 
-## Installation
+## Official Installation
 
-- [Chrome Web Store](https://chrome.google.com/webstore/detail/simple-translate/ibplnjkanclpjokhdolnendpplpjiace)
-- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/cllnohpbfenopiakdcjmjcbaeapmkcdl)
 - Firefox Add-ons (Coming Soon)
+- Chrome Web Store (Coming Soon)
+- Microsoft Edge Add-ons (Coming Soon)
 
 ## Support the Project
 
