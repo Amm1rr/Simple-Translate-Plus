@@ -48,20 +48,57 @@ export async function fetchAndListen(text, sourceLang = "en") {
 
     const cachedAudio = await getAudioFromCache(text, sourceLang);
     if (cachedAudio) {
-      await playAudioFromCache(cachedAudio);
-      return;
+      return playAudioFromCache(cachedAudio);
     }
 
-    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-      text
-    )}&tl=${sourceLang}&samesite=none;secure`;
+    const url = new URL("https://translate.google.com/translate_tts");
+    url.searchParams.set("client", "tw-ob");
+    url.searchParams.set("q", text);
+    url.searchParams.set("tl", sourceLang);
+    url.searchParams.set("samesite", "none");
+    url.searchParams.set("secure", "");
+
     const response = await fetch(url);
+
+    if (!response.ok) {
+      const errorMessages = {
+        0: "networkError",
+        400: "ttsLanguageUnavailable",
+        429: "unavailableError",
+        503: "unavailableError",
+      };
+
+      const errorKey = errorMessages[response.status] || "unknownError";
+      const errorMessage = browser.i18n.getMessage(errorKey);
+
+      console.debug(
+        errorKey === "ttsLanguageUnavailable"
+          ? `${errorMessage} (${
+              sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
+            })`
+          : `${errorMessage} [${response.status} ${response.statusText}]`
+      );
+
+      return false;
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("audio/")) {
+      console.error("The response is not an audio file.");
+      return false;
+    }
+
     const audioBlob = await response.blob();
+    if (audioBlob.size === 0) {
+      console.error("Received empty audio file.");
+      return false;
+    }
 
     await setAudioInCache(text, sourceLang, audioBlob);
-    await playAudioFromCache(audioBlob);
+    return playAudioFromCache(audioBlob);
   } catch (error) {
-    console.error("background.js -> Error:", error);
+    console.error("fetchAndListen error:", error);
+    // Consider implementing user-friendly error handling here
   }
 }
 

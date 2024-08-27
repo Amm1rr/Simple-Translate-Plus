@@ -458,6 +458,9 @@
   "unavailableError": {
     "message": "Error: Service usage limit reached. Please wait a while and try again."
   },
+  "ttsLanguageUnavailable": {
+    "message": "Info: Text-to-speech is not available for the selected language."
+  },
   "deeplAuthError": {
     "message": "Error: Authentication of DeepL API failed. Please set the authentication key and plan correctly on the settings page."
   },
