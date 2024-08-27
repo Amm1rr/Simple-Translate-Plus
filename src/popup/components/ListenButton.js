@@ -3,12 +3,6 @@ import browser from "webextension-polyfill";
 import log from "loglevel";
 import SpeakerIcon from "../icons/speaker.svg";
 import "../styles/ListenButton.scss";
-import { LOCAL_TTS_SERVER } from "../../common/local_tts_server";
-import {
-  getAudioFromCache,
-  setAudioInCache,
-  playAudioFromCache,
-} from "../../common/audioCache";
 
 const logDir = "popup/AudioButton";
 
@@ -49,78 +43,6 @@ export default class ListenButton extends Component {
     }
   };
 
-  playAudio = async (text, lang) => {
-    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-      text
-    )}&tl=${lang}`;
-    const audio = new Audio(url);
-    audio.crossOrigin = "anonymous";
-    audio.load();
-
-    await browser.permissions.request({
-      origins: ["https://translate.google.com/*"],
-    });
-
-    await audio.play().catch((e) => log.error(logDir, "playAudio()", e, url));
-  };
-
-  playAudioInBackground = async (text, lang) => {
-    const cachedAudio = await getAudioFromCache(text, lang);
-
-    if (cachedAudio) {
-      await playAudioFromCache(cachedAudio);
-      return;
-    }
-
-    const url = `https://translate.google.com/translate_tts?client=tw-ob&q=${encodeURIComponent(
-      text
-    )}&tl=${lang}`;
-
-    try {
-      const response = await fetch(url);
-      const audioData = await response.arrayBuffer();
-
-      await setAudioInCache(text, lang, audioData);
-      await playAudioFromCache(audioData);
-    } catch (error) {
-      // console.debug("Error playing audio in playAudioInBackground:", error);
-    }
-  };
-
-  playAudioInBackgroundOrigin = async (text, lang) => {
-    const cachedAudio = await getAudioFromCache(text, lang);
-
-    if (cachedAudio) {
-      await playAudioFromCache(cachedAudio);
-      return;
-    }
-
-    const url = `${LOCAL_TTS_SERVER}/translate_tts?text=${encodeURIComponent(
-      text
-    )}&lang=${lang}`;
-
-    try {
-      // console.debug("Generated Google TTS URL:", url);
-      const response = await fetch(url);
-      const audioData = await response.arrayBuffer();
-
-      await setAudioInCache(text, lang, audioData);
-      await playAudioFromCache(audioData);
-    } catch (error) {
-      console.debug(
-        "Error playing audio in playAudioInBackgroundOrigin:",
-        error
-      );
-    }
-  };
-
-  playAudioBuffer = (audioBuffer) => {
-    const sourceNode = this.audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer;
-    sourceNode.connect(this.audioContext.destination);
-    sourceNode.start(0);
-  };
-
   getPageLanguage = () => {
     // Helper function to extract the base language code
     const getBaseLanguage = (lang) => {
@@ -150,21 +72,6 @@ export default class ListenButton extends Component {
     return "en";
   };
 
-  ListenTTS = async (services = "origin", text, lang) => {
-    const { tts } = services;
-    if (tts == "google") {
-      await this.playAudio(text, lang);
-      // console.debug("Playing audio:", text);
-    } else if (tts == "background") {
-      // console.debug("Playing audio in background:", text);
-      await this.playAudioInBackground(text, lang);
-    } else {
-      // console.debug("Playing audio in origin:", tts, text, lang);
-      const currentPageLanguage = lang;
-      this.playAudioInBackgroundOrigin(text, currentPageLanguage);
-    }
-  };
-
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
@@ -183,10 +90,6 @@ export default class ListenButton extends Component {
       text: text,
       sourceLang: voiceLang,
     });
-
-    // Uncomment one of these lines to use the local caching mechanism
-    // this.ListenTTS("origin", text, voiceLang);
-    // this.ListenTTS("background", text, voiceLang);
   };
 
   render() {
