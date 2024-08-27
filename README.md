@@ -2,9 +2,11 @@
 
 #### Instantly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
 
-[<img src="other/promotion/badges/firefox.png" align="left" alt="for Firefox (soon...)">](https://addons.mozilla.org/firefox/addon/simple-translate/)
-[<img src="other/promotion/badges/chrome.png" alt="for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate-plus/)
-[for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/)
+[<img src="other/promotion/badges/firefox.png" align="left" alt="Simple Translate Plus for Firefox (soon...)"  height="60px">](https://addons.mozilla.org/firefox/addon/simple-translate/)
+
+[<img src="other/promotion/badges/chrome.png" alt="Simple Translate Plus for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate-plus/)
+
+[<img src="other/promotion/badges/edge.png" alt="Simple Translate Plus for Microsoft Edge (soon...)" height="40px">](https://microsoftedge.microsoft.com/addons/detail/)
 
 ## About
 
