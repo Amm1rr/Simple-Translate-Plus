@@ -42,8 +42,12 @@ if (browser.webNavigation) {
   });
 }
 
-export async function fetchAndListen(text, sourceLang = "en") {
-  log.debug(logDir, "fetchAndListen called", { text, sourceLang });
+export async function fetchAndListen(
+  text,
+  sourceLang = "en",
+  forcePlay = false
+) {
+  log.debug(logDir, "fetchAndListen called", { text, sourceLang, forcePlay });
   try {
     sourceLang = sourceLang === "auto" ? "en" : sourceLang;
 
@@ -53,57 +57,15 @@ export async function fetchAndListen(text, sourceLang = "en") {
       return playAudioFromCache(cachedAudio);
     }
 
-    const url = new URL("https://translate.google.com/translate_tts");
-    url.searchParams.set("client", "tw-ob");
-    url.searchParams.set("q", text);
-    url.searchParams.set("tl", sourceLang);
-    url.searchParams.set("samesite", "none");
-    url.searchParams.set("secure", "");
-
-    log.debug(logDir, "Fetching audio from URL", url.toString());
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      const errorMessages = {
-        0: "networkError",
-        400: "ttsLanguageUnavailable",
-        429: "unavailableError",
-        503: "unavailableError",
-      };
-
-      const errorKey = errorMessages[response.status] || "unknownError";
-      const errorMessage = browser.i18n.getMessage(errorKey);
-
-      log.warn(
-        logDir,
-        errorKey === "ttsLanguageUnavailable"
-          ? `${errorMessage} (${
-              sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
-            })`
-          : `${errorMessage} [${response.status} ${response.statusText}]`
-      );
-
-      return false;
+    if (!forcePlay) {
+      log.debug(logDir, "Not forced to play, skipping fetch");
+      return;
     }
 
-    const contentType = response.headers.get("content-type");
-    if (!contentType?.includes("audio/")) {
-      log.error(logDir, "The response is not an audio file.");
-      return false;
-    }
-
-    const audioBlob = await response.blob();
-    if (audioBlob.size === 0) {
-      log.error(logDir, "Received empty audio file.");
-      return false;
-    }
-
-    log.debug(logDir, "Audio fetched successfully, caching and playing");
-    await setAudioInCache(text, sourceLang, audioBlob);
-    return playAudioFromCache(audioBlob);
+    log.debug(logDir, "Fetching audio");
+    await fetchAndPlayAudio(text, sourceLang);
   } catch (error) {
     log.error(logDir, "fetchAndListen error:", error);
-    // Consider implementing user-friendly error handling here
   }
 }
 

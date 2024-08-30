@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
+import log from "loglevel";
 import {
   initSettings,
   getSettings,
@@ -9,7 +10,10 @@ import {
 import { updateLogLevel, overWriteLogLevel } from "src/common/log";
 import TranslateContainer from "./components/TranslateContainer";
 
+const logDir = "content/index";
+
 const init = async () => {
+  log.debug(logDir, "Initializing");
   await initSettings();
   document.addEventListener("mouseup", handleMouseUp);
   document.addEventListener("keydown", handleKeyDown);
@@ -19,29 +23,43 @@ const init = async () => {
   overWriteLogLevel();
   updateLogLevel();
   disableExtensionByUrlList();
+  log.debug(logDir, "Initialization complete");
 };
 init();
 
 let prevSelectedText = "";
 const handleMouseUp = async (e) => {
+  log.debug(logDir, "Mouse up event", e);
   await waitTime(10);
 
   const isLeftClick = e.button === 0;
-  if (!isLeftClick) return;
+  if (!isLeftClick) {
+    log.debug(logDir, "Not a left click, returning");
+    return;
+  }
 
   const isInPasswordField =
     e.target.tagName === "INPUT" && e.target.type === "password";
-  if (isInPasswordField) return;
+  if (isInPasswordField) {
+    log.debug(logDir, "In password field, returning");
+    return;
+  }
 
   const inCodeElement =
     e.target.tagName === "CODE" ||
     (!!e.target.closest && !!e.target.closest("code"));
-  if (inCodeElement && getSettings("isDisabledInCodeElement")) return;
+  if (inCodeElement && getSettings("isDisabledInCodeElement")) {
+    log.debug(logDir, "In code element and disabled, returning");
+    return;
+  }
 
   const isInThisElement =
     document.querySelector("#simple-translate-plus") &&
     document.querySelector("#simple-translate-plus").contains(e.target);
-  if (isInThisElement) return;
+  if (isInThisElement) {
+    log.debug(logDir, "In this element, returning");
+    return;
+  }
 
   removeTranslatecontainer();
 
@@ -53,31 +71,52 @@ const handleMouseUp = async (e) => {
     const ignoredLangSelector = ignoredDocumentLang
       .map((lang) => `[lang="${lang}"]`)
       .join(",");
-    if (!!e.target.closest && !!e.target.closest(ignoredLangSelector)) return;
+    if (!!e.target.closest && !!e.target.closest(ignoredLangSelector)) {
+      log.debug(logDir, "In ignored language element, returning");
+      return;
+    }
   }
 
   const selectedText = getSelectedText();
   prevSelectedText = selectedText;
-  if (selectedText.length === 0) return;
+  if (selectedText.length === 0) {
+    log.debug(logDir, "No text selected, returning");
+    return;
+  }
 
   if (getSettings("isDisabledInTextFields")) {
-    if (isInContentEditable()) return;
+    if (isInContentEditable()) {
+      log.debug(logDir, "In content editable and disabled, returning");
+      return;
+    }
   }
 
   if (getSettings("ifOnlyTranslateWhenModifierKeyPressed")) {
     const modifierKey = getSettings("modifierKey");
     switch (modifierKey) {
       case "shift":
-        if (!e.shiftKey) return;
+        if (!e.shiftKey) {
+          log.debug(logDir, "Shift key not pressed, returning");
+          return;
+        }
         break;
       case "alt":
-        if (!e.altKey) return;
+        if (!e.altKey) {
+          log.debug(logDir, "Alt key not pressed, returning");
+          return;
+        }
         break;
       case "ctrl":
-        if (!e.ctrlKey) return;
+        if (!e.ctrlKey) {
+          log.debug(logDir, "Ctrl key not pressed, returning");
+          return;
+        }
         break;
       case "cmd":
-        if (!e.metaKey) return;
+        if (!e.metaKey) {
+          log.debug(logDir, "Cmd key not pressed, returning");
+          return;
+        }
         break;
       default:
         break;
@@ -86,6 +125,11 @@ const handleMouseUp = async (e) => {
 
   const clickedPosition = { x: e.clientX, y: e.clientY };
   const selectedPosition = getSelectedPosition();
+  log.debug(logDir, "Showing translate container", {
+    selectedText,
+    selectedPosition,
+    clickedPosition,
+  });
   showTranslateContainer(selectedText, selectedPosition, clickedPosition);
 };
 
@@ -94,16 +138,19 @@ const waitTime = (time) => {
 };
 
 const getSelectedText = () => {
+  log.debug(logDir, "Getting selected text");
   const element = document.activeElement;
   const isInTextField =
     element.tagName === "INPUT" || element.tagName === "TEXTAREA";
   const selectedText = isInTextField
     ? element.value.substring(element.selectionStart, element.selectionEnd)
     : window.getSelection()?.toString() ?? "";
+  log.debug(logDir, "Selected text", selectedText);
   return selectedText;
 };
 
 const getSelectedPosition = () => {
+  log.debug(logDir, "Getting selected position");
   const element = document.activeElement;
   const isInTextField =
     element.tagName === "INPUT" || element.tagName === "TEXTAREA";
@@ -128,10 +175,12 @@ const getSelectedPosition = () => {
       };
       break;
   }
+  log.debug(logDir, "Selected position", selectedPosition);
   return selectedPosition;
 };
 
 const isInContentEditable = () => {
+  log.debug(logDir, "Checking if in content editable");
   const element = document.activeElement;
   if (element.tagName === "INPUT" || element.tagName === "TEXTAREA")
     return true;
@@ -140,12 +189,14 @@ const isInContentEditable = () => {
 };
 
 const handleKeyDown = (e) => {
+  log.debug(logDir, "Key down event", e);
   if (e.key === "Escape") {
     removeTranslatecontainer();
   }
 };
 
 const handleVisibilityChange = () => {
+  log.debug(logDir, "Visibility change", document.visibilityState);
   if (document.visibilityState === "hidden") {
     browser.storage.local.onChanged.removeListener(handleSettingsChange);
   } else {
@@ -155,6 +206,7 @@ const handleVisibilityChange = () => {
 
 let isEnabled = true;
 const handleMessage = async (request) => {
+  log.debug(logDir, "Handling message", request);
   const empty = new Promise((resolve) => {
     setTimeout(() => {
       return resolve("");
@@ -194,6 +246,7 @@ const handleMessage = async (request) => {
 };
 
 const disableExtensionByUrlList = () => {
+  log.debug(logDir, "Disabling extension by URL list");
   const disableUrls = getSettings("disableUrlList").split("\n");
   let pageUrl;
   try {
@@ -214,9 +267,11 @@ const disableExtensionByUrlList = () => {
 
   const isMatched = disableUrls.some(matchesPageUrl);
   if (isMatched) isEnabled = false;
+  log.debug(logDir, "Extension enabled", isEnabled);
 };
 
 const removeTranslatecontainer = async () => {
+  log.debug(logDir, "Removing translate container");
   const element = document.getElementById("simple-translate-plus");
   if (!element) return;
 
@@ -230,6 +285,12 @@ const showTranslateContainer = (
   clickedPosition = null,
   shouldTranslate = false
 ) => {
+  log.debug(logDir, "Showing translate container", {
+    selectedText,
+    selectedPosition,
+    clickedPosition,
+    shouldTranslate,
+  });
   const element = document.getElementById("simple-translate-plus");
   if (element) return;
   if (!isEnabled) return;

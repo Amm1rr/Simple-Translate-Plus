@@ -34,7 +34,7 @@ export const setAudioInCache = async (text, lang, audioData) => {
   log.debug(logDir, "Audio set in cache");
 };
 
-export const clearAudioCache = async () => {
+const clearAudioCache = async () => {
   log.debug(logDir, "Clearing audio cache");
   await browser.storage.local.remove(AUDIO_CACHE_KEY);
   log.debug(logDir, "Audio cache cleared");

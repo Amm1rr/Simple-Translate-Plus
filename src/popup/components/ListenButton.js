@@ -79,6 +79,7 @@ export default class ListenButton extends Component {
       message: "listen",
       text: text,
       sourceLang: voiceLang,
+      forcePlay: true,
     });
   };
 

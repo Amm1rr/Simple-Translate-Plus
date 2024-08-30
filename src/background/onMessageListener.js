@@ -38,9 +38,11 @@ export default async (data, sender, sendResponse) => {
           "Listening to:",
           data.text,
           "in language:",
-          data.sourceLang
+          data.sourceLang,
+          "forcePlay:",
+          data.forcePlay
         );
-        fetchAndListen(data.text, data.sourceLang);
+        fetchAndListen(data.text, data.sourceLang, data.forcePlay);
         sendResponse({ success: true });
         log.debug(logDir, "Listen response sent");
         return true;

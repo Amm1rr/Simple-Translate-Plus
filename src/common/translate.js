@@ -1,7 +1,11 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
-import { getAudioFromCache, playAudioFromCache } from "./audioCache";
+import {
+  getAudioFromCache,
+  setAudioInCache,
+  playAudioFromCache,
+} from "./audioCache";
 
 const logDir = "common/translate";
 
@@ -55,6 +59,11 @@ const setHistory = async (
 };
 
 const autoplayPronunciation = async (word, sourceLang, listen) => {
+  log.debug(logDir, "autoplayPronunciation called", {
+    word,
+    sourceLang,
+    listen,
+  });
   let autoPlay;
   if (listen === true) {
     autoPlay = true;
@@ -78,52 +87,46 @@ const autoplayPronunciation = async (word, sourceLang, listen) => {
     if (cachedAudio) {
       log.debug(logDir, "Playing cached audio");
       await playAudioFromCache(cachedAudio);
-      return;
+    } else {
+      log.debug(logDir, "No cached audio found, fetching and playing");
+      await fetchAndPlayAudio(word, sourceLang);
     }
+  } else {
+    log.debug(logDir, "Autoplay is disabled, skipping audio playback");
+  }
+};
 
-    const url = new URL("https://translate.google.com/translate_tts");
-    url.searchParams.set("client", "tw-ob");
-    url.searchParams.set("q", word);
-    url.searchParams.set("tl", sourceLang);
-    url.searchParams.set("samesite", "none");
-    url.searchParams.set("secure", "");
+const fetchAndPlayAudio = async (word, sourceLang) => {
+  log.debug(logDir, "Fetching audio", { word, sourceLang });
+  const url = new URL("https://translate.google.com/translate_tts");
+  url.searchParams.set("client", "tw-ob");
+  url.searchParams.set("q", word);
+  url.searchParams.set("tl", sourceLang);
+  url.searchParams.set("samesite", "none");
+  url.searchParams.set("secure", "");
 
+  try {
     const response = await fetch(url);
 
     if (!response.ok) {
-      const errorMessages = {
-        0: "networkError",
-        400: "ttsLanguageUnavailable",
-        429: "unavailableError",
-        503: "unavailableError",
-      };
-
-      const errorKey = errorMessages[response.status] || "unknownError";
-      const errorMessage = browser.i18n.getMessage(errorKey);
-
-      log.warn(
-        logDir,
-        errorKey === "ttsLanguageUnavailable"
-          ? `${errorMessage} (${
-              sourceLang.charAt(0).toUpperCase() + sourceLang.slice(1)
-            })`
-          : `${errorMessage} [${response.status} ${response.statusText}]`
-      );
-
-      return false;
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const contentType = response.headers.get("content-type");
     if (!contentType?.includes("audio/")) {
-      log.error(logDir, "The response is not an audio file.");
-      return false;
+      throw new Error("The response is not an audio file.");
     }
 
     const audioBlob = await response.blob();
     if (audioBlob.size === 0) {
-      log.error(logDir, "Received empty audio file.");
-      return false;
+      throw new Error("Received empty audio file.");
     }
+
+    log.debug(logDir, "Audio fetched successfully, caching and playing");
+    await setAudioInCache(word, sourceLang, audioBlob);
+    await playAudioFromCache(audioBlob);
+  } catch (error) {
+    log.error(logDir, "Error fetching or playing audio:", error);
   }
 };
 
@@ -153,6 +156,10 @@ const sendRequestToGoogle = async (word, sourceLang, targetLang, listen) => {
       resultData.errorMessage = browser.i18n.getMessage("networkError");
     else if (response.status === 429 || response.status === 503)
       resultData.errorMessage = browser.i18n.getMessage("unavailableError");
+    else if (response.status === 400)
+      resultData.errorMessage = browser.i18n.getMessage(
+        "ttsLanguageUnavailable"
+      );
     else
       resultData.errorMessage = `${browser.i18n.getMessage("unknownError")} [${
         response.status
@@ -240,7 +247,6 @@ const sendRequestToDeepL = async (word, sourceLang, targetLang) => {
 
 const updateVoiceLanguage = async (word, sourceLang) => {
   log.debug(logDir, "Updating Voice Language:", sourceLang);
-  await autoplayPronunciation(word, sourceLang);
 
   browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0]) {
@@ -292,7 +298,7 @@ export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
   result.voiceLang = result.sourceLanguage;
 
   await updateVoiceLanguage(sourceWord, result.sourceLanguage);
-
+  await autoplayPronunciation(sourceWord, result.voiceLang);
   setHistory(sourceWord, sourceLang, targetLang, translationApi, result);
   return result;
 };
