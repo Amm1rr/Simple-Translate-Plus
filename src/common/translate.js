@@ -9,8 +9,8 @@ import {
 
 const logDir = "common/translate";
 
-// Set the log level for this module (you can adjust this as needed)
-log.setLevel(log.levels.DEBUG);
+// // Set the log level for this module (you can adjust this as needed)
+// log.setLevel(log.levels.DEBUG);
 
 const getCacheKey = (sourceWord, sourceLang, targetLang, translationApi) => {
   return `${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`;
@@ -126,7 +126,13 @@ const fetchAndPlayAudio = async (word, sourceLang) => {
     await setAudioInCache(word, sourceLang, audioBlob);
     await playAudioFromCache(audioBlob);
   } catch (error) {
-    log.error(logDir, "Error fetching or playing audio:", error);
+    if (error.message.includes("status: 400")) {
+      console.info(
+        "Received a 400 error. This might be due to an invalid request or unsupported language."
+      );
+    } else {
+      log.error(logDir, "Error fetching or playing audio:", error);
+    }
   }
 };
 
