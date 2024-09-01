@@ -1,8 +1,8 @@
 import { initSettings } from "src/settings/settings";
 import translate from "src/common/translate";
-import { fetchAndListen } from "src/background/background";
 import log from "loglevel";
 import browser from "webextension-polyfill";
+import { fetchAndPlayAudioFromGoogle } from "../common/audioUtils";
 
 const logDir = "background/onMessageListener";
 
@@ -42,7 +42,7 @@ export default async (data, sender, sendResponse) => {
           "forcePlay:",
           data.forcePlay
         );
-        fetchAndListen(data.text, data.sourceLang, data.forcePlay);
+        fetchAndPlayAudioFromGoogle(data.text, data.sourceLang, data.forcePlay);
         sendResponse({ success: true });
         log.debug(logDir, "Listen response sent");
         return true;
