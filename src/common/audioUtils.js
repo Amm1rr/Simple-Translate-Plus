@@ -38,7 +38,7 @@ export const fetchAndPlayAudioFromGoogle = async (word, sourceLang) => {
 
     log.debug(logDir, "Audio fetched successfully, caching and playing");
     await setAudioInCache(word, sourceLang, audioBlob);
-    await playAudioFromCache(audioBlob);
+    playAudioFromCache(audioBlob); // Remove await here
   } catch (error) {
     if (error.message.includes("status: 400")) {
       console.info(

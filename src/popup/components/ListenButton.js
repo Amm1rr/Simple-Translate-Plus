@@ -52,13 +52,6 @@ export default class ListenButton extends Component {
     }
   };
 
-  getPageLanguage = () => {
-    // ... (existing code)
-    const lang = "en"; // Default value, replace with actual implementation
-    log.debug(logDir, "Page language detected", lang);
-    return lang;
-  };
-
   handleClick = () => {
     const { text, lang, inPanel } = this.props;
     const { voiceLang } = this.state;
@@ -74,13 +67,17 @@ export default class ListenButton extends Component {
     }
 
     log.debug(logDir, "Sending listen message");
-    browser.runtime.sendMessage({
-      action: "listen",
-      message: "listen",
-      text: text,
-      sourceLang: voiceLang,
-      forcePlay: true,
-    });
+    browser.runtime
+      .sendMessage({
+        action: "listen",
+        message: "listen",
+        text: text,
+        sourceLang: voiceLang,
+        forcePlay: true,
+      })
+      .catch((error) => {
+        log.error(logDir, "Error sending listen message", error);
+      });
   };
 
   render() {

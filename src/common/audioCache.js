@@ -40,7 +40,7 @@ const clearAudioCache = async () => {
   log.debug(logDir, "Audio cache cleared");
 };
 
-export const playAudioFromCache = async (audioData) => {
+export const playAudioFromCache = (audioData) => {
   log.debug(logDir, "Playing audio from cache", {
     audioDataType: audioData.constructor.name,
   });
@@ -48,18 +48,21 @@ export const playAudioFromCache = async (audioData) => {
     if (audioData instanceof ArrayBuffer) {
       const audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
-      const audioBuffer = await audioContext.decodeAudioData(audioData);
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-      sourceNode.start(0);
-      log.debug(logDir, "ArrayBuffer audio played successfully");
+      audioContext.decodeAudioData(audioData, (audioBuffer) => {
+        const sourceNode = audioContext.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+        sourceNode.connect(audioContext.destination);
+        sourceNode.start(0);
+        log.debug(logDir, "ArrayBuffer audio played successfully");
+      });
     } else if (audioData instanceof Blob) {
       const audioUrl = URL.createObjectURL(audioData);
       const audio = new Audio(audioUrl);
-      await audio.play();
-      URL.revokeObjectURL(audioUrl);
-      log.debug(logDir, "Blob audio played successfully");
+      audio.onended = () => URL.revokeObjectURL(audioUrl);
+      audio.play().catch((error) => {
+        log.error(logDir, "Error playing Blob audio", error);
+      });
+      log.debug(logDir, "Blob audio playback started");
     } else {
       log.warn(logDir, "Unsupported audio data type", {
         type: audioData.constructor.name,

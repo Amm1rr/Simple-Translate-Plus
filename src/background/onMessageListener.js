@@ -45,7 +45,7 @@ export default async (data, sender, sendResponse) => {
         fetchAndPlayAudioFromGoogle(data.text, data.sourceLang, data.forcePlay);
         sendResponse({ success: true });
         log.debug(logDir, "Listen response sent");
-        return true;
+        return false; // Don't keep the message channel open
       }
       case "VoiceLanguage": {
         log.debug(
