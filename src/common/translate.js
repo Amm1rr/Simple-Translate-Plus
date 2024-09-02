@@ -1,11 +1,6 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
-import {
-  getAudioFromCache,
-  setAudioInCache,
-  playAudioFromCache,
-} from "./audioCache";
 import { playPronunciationIfEnabled } from "../common/audioUtils";
 
 const logDir = "common/translate";
