@@ -1,7 +1,8 @@
 // src/options/components/OptionsPage.js
-import React, { useEffect } from "react";
+
+import React, { useEffect, useMemo, useCallback } from "react";
 import browser from "webextension-polyfill";
-import { HashRouter } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { initSettings, getSettings } from "../../settings/settings";
 import SideBar from "./SideBar";
 import ContentsArea from "./ContentsArea";
@@ -10,12 +11,14 @@ import "../styles/OptionsPage.scss";
 
 const AUDIO_CACHE_KEY = "SimpleTranslatePlusAudioCache";
 
-const setupTheme = async () => {
-  await initSettings();
-  const theme = getSettings("theme");
-  document.body.classList.add(`${theme}-theme`);
+const OptionsPage = () => {
+  const optionsPageClassName = useMemo(() => {
+    const UILanguage = browser.i18n.getUILanguage();
+    const rtlLanguage = ["he", "ar"].includes(UILanguage);
+    return "optionsPage" + (rtlLanguage ? " rtl-language" : "");
+  }, []);
 
-  browser.storage.local.onChanged.addListener((changes) => {
+  const handleStorageChange = useCallback((changes) => {
     // Ignore changes to the audio cache
     if (AUDIO_CACHE_KEY in changes) return;
 
@@ -34,25 +37,33 @@ const setupTheme = async () => {
         );
       }
     }
-  });
-};
-
-const UILanguage = browser.i18n.getUILanguage();
-const rtlLanguage = ["he", "ar"].includes(UILanguage);
-const optionsPageClassName =
-  "optionsPage" + (rtlLanguage ? " rtl-language" : "");
-
-const OptionsPage = () => {
-  useEffect(() => {
-    setupTheme();
   }, []);
 
+  useEffect(() => {
+    const setupTheme = async () => {
+      await initSettings();
+      const theme = getSettings("theme");
+      document.body.classList.add(`${theme}-theme`);
+
+      browser.storage.local.onChanged.addListener(handleStorageChange);
+    };
+
+    setupTheme();
+
+    // Clean up function
+    return () => {
+      browser.storage.local.onChanged.removeListener(handleStorageChange);
+    };
+  }, [handleStorageChange]);
+
   return (
-    <HashRouter hashType="noslash">
+    <HashRouter>
       <ScrollToTop>
         <div className={optionsPageClassName}>
           <SideBar />
-          <ContentsArea />
+          <Routes>
+            <Route path="/*" element={<ContentsArea />} />
+          </Routes>
         </div>
       </ScrollToTop>
     </HashRouter>

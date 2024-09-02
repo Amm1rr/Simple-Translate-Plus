@@ -70,6 +70,10 @@ export default class PopupPage extends Component {
     this.init();
   }
 
+  componentDidMount() {
+    this.init();
+  }
+
   init = async () => {
     await initSettings();
     overWriteLogLevel();
@@ -91,13 +95,18 @@ export default class PopupPage extends Component {
     });
 
     const tabInfo = await getTabInfo();
-    this.setState({
-      isConnected: tabInfo.isConnected,
-      inputText: tabInfo.selectedText,
-      tabUrl: tabInfo.url,
-      isEnabledOnPage: tabInfo.isEnabledOnPage,
-    });
-    if (tabInfo.selectedText !== "") this.handleInputText(tabInfo.selectedText);
+    this.setState(
+      {
+        isConnected: tabInfo.isConnected,
+        inputText: tabInfo.selectedText,
+        tabUrl: tabInfo.url,
+        isEnabledOnPage: tabInfo.isEnabledOnPage,
+      },
+      () => {
+        if (tabInfo.selectedText !== "")
+          this.handleInputText(tabInfo.selectedText);
+      }
+    );
 
     document.body.style.width = "348px";
   };

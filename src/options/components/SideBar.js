@@ -1,52 +1,67 @@
 import React from "react";
 import browser from "webextension-polyfill";
-import { Link, withRouter } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import browserInfo from "browser-info";
 import "../styles/SideBar.scss";
+import log from "loglevel";
+
+const logDir = "options/SideBar";
 
 const isValidShortcuts =
-  browserInfo().name == "Firefox" && browserInfo().version >= 60;
+  browserInfo().name === "Firefox" && browserInfo().version >= 60;
 
-const SideBar = (props) => (
-  <div className="sideBar">
-    <div className="titleContainer">
-      <img src="/icons/64.png" className="logo" />
-      <span className="logoTitle">Simple Translate+</span>
-    </div>
-    <ul>
-      <li
-        className={`sideBarItem ${
-          ["/shortcuts", "/information"].every(
-            (path) => path != props.location.pathname
-          )
-            ? "selected"
-            : ""
-        }`}
-      >
-        <Link to="/settings">{browser.i18n.getMessage("settingsLabel")}</Link>
-      </li>
-      {isValidShortcuts && (
+log.debug(logDir, "Browser info", {
+  name: browserInfo().name,
+  version: browserInfo().version,
+  isValidShortcuts,
+});
+
+const SideBar = () => {
+  const location = useLocation();
+
+  log.debug(logDir, "Rendering SideBar", { pathname: location.pathname });
+
+  return (
+    <div className="sideBar">
+      <div className="titleContainer">
+        <img src="/icons/64.png" className="logo" alt="Logo" />
+        <span className="logoTitle">Simple Translate+</span>
+      </div>
+      <ul>
         <li
           className={`sideBarItem ${
-            props.location.pathname == "/shortcuts" ? "selected" : ""
+            ["/shortcuts", "/information"].every(
+              (path) => path !== location.pathname
+            )
+              ? "selected"
+              : ""
           }`}
         >
-          <Link to="/shortcuts">
-            {browser.i18n.getMessage("shortcutsLabel")}
+          <Link to="/settings">{browser.i18n.getMessage("settingsLabel")}</Link>
+        </li>
+        {isValidShortcuts && (
+          <li
+            className={`sideBarItem ${
+              location.pathname === "/shortcuts" ? "selected" : ""
+            }`}
+          >
+            <Link to="/shortcuts">
+              {browser.i18n.getMessage("shortcutsLabel")}
+            </Link>
+          </li>
+        )}
+        <li
+          className={`sideBarItem ${
+            location.pathname === "/information" ? "selected" : ""
+          }`}
+        >
+          <Link to="/information">
+            {browser.i18n.getMessage("informationLabel")}
           </Link>
         </li>
-      )}
-      <li
-        className={`sideBarItem ${
-          props.location.pathname == "/information" ? "selected" : ""
-        }`}
-      >
-        <Link to="/information">
-          {browser.i18n.getMessage("informationLabel")}
-        </Link>
-      </li>
-    </ul>
-  </div>
-);
+      </ul>
+    </div>
+  );
+};
 
-export default withRouter(SideBar);
+export default SideBar;

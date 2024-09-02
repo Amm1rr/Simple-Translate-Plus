@@ -1,12 +1,8 @@
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
-import { playPronunciationIfEnabled } from "../common/audioUtils";
 
 const logDir = "common/translate";
-
-// // Set the log level for this module (you can adjust this as needed)
-// log.setLevel(log.levels.DEBUG);
 
 const getCacheKey = (sourceWord, sourceLang, targetLang, translationApi) => {
   return `${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`;

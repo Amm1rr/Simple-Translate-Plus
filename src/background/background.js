@@ -43,7 +43,7 @@ const init = async () => {
   try {
     await Promise.all([initSettings(), overWriteLogLevel(), updateLogLevel()]);
     log.info(logDir, "Initialization complete");
-    showMenus();
+    await showMenus();
   } catch (error) {
     log.error(logDir, "Initialization failed:", error);
   }

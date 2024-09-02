@@ -1,46 +1,48 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import browser from "webextension-polyfill";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import CopyIcon from "../icons/copy.svg";
 import "../styles/CopyButton.scss";
+import log from "loglevel";
 
-export default class CopyButton extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isCopied: false };
-  }
+const logDir = "popup/CopyButton";
 
-  handleCopy = (copiedText) => {
+const CopyButton = ({ text }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    log.debug(logDir, "Text changed, resetting copied state", { text });
+    setIsCopied(false);
+  }, [text]);
+
+  const handleCopy = (copiedText) => {
+    log.debug(logDir, "Copying text to clipboard", { copiedText });
     navigator.clipboard.writeText(copiedText);
-    this.setState({ isCopied: true });
+    setIsCopied(true);
   };
 
-  componentDidUpdate(prevProps) {
-    if (this.props.text !== prevProps.text) {
-      this.setState({ isCopied: false });
-    }
+  if (!text) {
+    log.debug(logDir, "No text to copy, not rendering button");
+    return null;
   }
 
-  render() {
-    const { text } = this.props;
-    if (!text) return null;
+  return (
+    <div className="copy">
+      {isCopied && (
+        <span className="copiedText">
+          {browser.i18n.getMessage("copiedLabel")}
+        </span>
+      )}
+      <CopyToClipboard text={text} onCopy={handleCopy}>
+        <button
+          className="copyButton"
+          title={browser.i18n.getMessage("copyLabel")}
+        >
+          <CopyIcon />
+        </button>
+      </CopyToClipboard>
+    </div>
+  );
+};
 
-    return (
-      <div className="copy">
-        {this.state.isCopied && (
-          <span className="copiedText">
-            {browser.i18n.getMessage("copiedLabel")}
-          </span>
-        )}
-        <CopyToClipboard text={text} onCopy={this.handleCopy}>
-          <button
-            className="copyButton"
-            title={browser.i18n.getMessage("copyLabel")}
-          >
-            <CopyIcon />
-          </button>
-        </CopyToClipboard>
-      </div>
-    );
-  }
-}
+export default CopyButton;

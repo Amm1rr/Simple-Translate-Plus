@@ -1,5 +1,6 @@
 import React from "react";
 import browser from "webextension-polyfill";
+import log from "loglevel";
 import generateLangOptions from "src/common/generateLangOptions";
 import { getSettings, setSettings } from "./settings";
 import {
@@ -11,13 +12,21 @@ import {
   BG_COLOR_DARK,
 } from "./defaultColors";
 
+const logDir = "settings/defaultSettings";
+
 const getDefaultLangs = () => {
   const uiLang = browser.i18n.getUILanguage();
   const langOptions = generateLangOptions("google");
 
-  const shouldUseUiLang = langOptions.some((lang) => lang.value == uiLang);
+  const shouldUseUiLang = langOptions.some((lang) => lang.value === uiLang);
   const targetLang = shouldUseUiLang ? uiLang : "en";
   const secondTargetLang = targetLang === "en" ? "ja" : "en";
+
+  log.debug(logDir, "Default languages determined", {
+    uiLang,
+    targetLang,
+    secondTargetLang,
+  });
 
   return { targetLang, secondTargetLang };
 };
@@ -29,6 +38,13 @@ const updateLangsWhenChangeTranslationApi = () => {
   const currentLangs = generateLangOptions(translationApi).map(
     (option) => option.value
   );
+
+  log.debug(logDir, "Updating languages for translation API change", {
+    translationApi,
+    targetLang,
+    secondTargetLang,
+    currentLangs,
+  });
 
   const mappingLang = (lang) => {
     switch (lang) {
@@ -62,7 +78,7 @@ const defaultLangs = getDefaultLangs();
 // MV2ではwindow.matchMediaでシステムテーマを取得していたが、MV3では簡単に実装できないためオミットする
 const getTheme = () => "light";
 
-export default [
+const defaultSettings = [
   {
     category: "generalLabel",
     elements: [
@@ -592,3 +608,7 @@ export default [
     ],
   },
 ];
+
+log.debug(logDir, "Default settings initialized", defaultSettings);
+
+export default defaultSettings;

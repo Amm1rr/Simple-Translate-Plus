@@ -101,6 +101,13 @@ export default class TranslateContainer extends Component {
     else this.handleTextSelect(this.props.clickedPosition);
   };
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.selectedText !== this.props.selectedText) {
+      // React to changes in selectedText
+      this.handleTextSelect(this.props.clickedPosition);
+    }
+  }
+
   handleTextSelect = async (clickedPosition) => {
     log.debug(logDir, "Handling text select", { clickedPosition });
     const onSelectBehavior = getSettings("whenSelectText");

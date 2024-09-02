@@ -1,51 +1,73 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
 import { updateLogLevel, overWriteLogLevel } from "src/common/log";
-import { initSettings, getAllSettings, resetAllSettings, exportSettings, importSettings, handleSettingsChange } from "src/settings/settings";
+import {
+  initSettings,
+  getAllSettings,
+  resetAllSettings,
+  exportSettings,
+  importSettings,
+  handleSettingsChange,
+} from "src/settings/settings";
 import defaultSettings from "src/settings/defaultSettings";
 import CategoryContainer from "./CategoryContainer";
+import log from "loglevel";
 
-export default class SettingsPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isInit: false,
-      currentValues: {}
+const logDir = "options/SettingsPage";
+
+const SettingsPage = () => {
+  const [isInit, setIsInit] = useState(false);
+  const [currentValues, setCurrentValues] = useState({});
+
+  useEffect(() => {
+    const init = async () => {
+      log.debug(logDir, "Initializing SettingsPage");
+      await initSettings();
+      overWriteLogLevel();
+      updateLogLevel();
+      setIsInit(true);
+      setCurrentValues(getAllSettings());
+
+      browser.storage.local.onChanged.addListener((changes) => {
+        log.debug(logDir, "Settings changed", changes);
+        const newSettings = handleSettingsChange(changes);
+        if (newSettings) setCurrentValues(newSettings);
+      });
     };
-    this.init();
-  }
 
-  async init() {
-    await initSettings();
-    overWriteLogLevel();
-    updateLogLevel();
-    this.setState({ isInit: true, currentValues: getAllSettings() });
-    browser.storage.local.onChanged.addListener(changes => {
-      const newSettings = handleSettingsChange(changes);
-      if (newSettings) this.setState({ currentValues: newSettings });
-    });
-  }
+    init();
 
-  render() {
-    const { isInit, currentValues } = this.state;
-    const settingsContent = (
-      <ul>
-        {defaultSettings.map((category, index) => (
-          <CategoryContainer {...category} key={index} currentValues={currentValues} />
-        ))}
-        <CategoryContainer {...additionalCategory} currentValues={currentValues} />
-      </ul>
-    );
+    return () => {
+      browser.storage.local.onChanged.removeListener(handleSettingsChange);
+    };
+  }, []);
 
-    return (
-      <div>
-        <p className="contentTitle">{browser.i18n.getMessage("settingsLabel")}</p>
-        <hr />
-        {isInit ? settingsContent : ""}
-      </div>
-    );
-  }
-}
+  log.debug(logDir, "Rendering SettingsPage", { isInit, currentValues });
+
+  const settingsContent = (
+    <ul>
+      {defaultSettings.map((category, index) => (
+        <CategoryContainer
+          {...category}
+          key={index}
+          currentValues={currentValues}
+        />
+      ))}
+      <CategoryContainer
+        {...additionalCategory}
+        currentValues={currentValues}
+      />
+    </ul>
+  );
+
+  return (
+    <div>
+      <p className="contentTitle">{browser.i18n.getMessage("settingsLabel")}</p>
+      <hr />
+      {isInit ? settingsContent : "Loading..."}
+    </div>
+  );
+};
 
 const additionalCategory = {
   category: "",
@@ -57,7 +79,7 @@ const additionalCategory = {
       type: "file",
       accept: ".json",
       value: "importButtonLabel",
-      onChange: importSettings
+      onChange: importSettings,
     },
     {
       id: "exportSettings",
@@ -66,8 +88,9 @@ const additionalCategory = {
       type: "button",
       value: "exportButtonLabel",
       onClick: async () => {
+        log.debug(logDir, "Exporting settings");
         await exportSettings();
-      }
+      },
     },
     {
       id: "resetSettings",
@@ -76,9 +99,12 @@ const additionalCategory = {
       type: "button",
       value: "resetSettingsButtonLabel",
       onClick: async () => {
+        log.debug(logDir, "Resetting settings");
         await resetAllSettings();
-        location.reload(true);
-      }
-    }
-  ]
+        window.location.reload();
+      },
+    },
+  ],
 };
+
+export default SettingsPage;

@@ -14,6 +14,9 @@ import TranslateContainer from "./components/TranslateContainer";
 
 const logDir = "content/index";
 
+// Suppress lifecycle warnings
+React.useLayoutEffect = React.useEffect;
+
 const init = async () => {
   log.debug(logDir, "Initializing");
   await initSettings();

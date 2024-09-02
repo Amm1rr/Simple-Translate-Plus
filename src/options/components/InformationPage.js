@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import browser from "webextension-polyfill";
 import browserInfo from "browser-info";
 import queryString from "query-string";
+import log from "loglevel";
 import OptionsContainer from "./OptionContainer";
 import {
   paypalLink,
@@ -12,22 +14,35 @@ import {
 } from "src/common/personalUrls";
 import manifest from "src/manifest-chrome.json";
 
-export default (props) => {
-  const query = queryString.parse(props.location.search);
+const logDir = "options/InformationPage";
+
+const InformationPage = () => {
+  const location = useLocation();
+  const query = queryString.parse(location.search);
   const extensionVersion = manifest.version;
 
-  const [sponsorsHeihgt, setSponsorsHeight] = useState();
+  const [sponsorsHeight, setSponsorsHeight] = useState(0);
+  const [hasPermission, requestPermission] = useAdditionalPermission();
 
   useEffect(() => {
+    log.debug(logDir, "InformationPage mounted");
     const setHeight = (e) => {
       if (e.data[0] !== "setSponsorsHeight") return;
+      log.debug(logDir, "Setting sponsors height", e.data[1]);
       setSponsorsHeight(e.data[1]);
     };
     window.addEventListener("message", setHeight);
-    return () => window.removeEventListener("message", setHeight);
-  });
+    return () => {
+      log.debug(logDir, "InformationPage unmounted");
+      window.removeEventListener("message", setHeight);
+    };
+  }, []);
 
-  const [hasPermission, requestPermission] = useAdditionalPermission();
+  log.debug(logDir, "Rendering InformationPage", {
+    query,
+    extensionVersion,
+    hasPermission,
+  });
 
   return (
     <div>
@@ -45,6 +60,7 @@ export default (props) => {
             <a
               href="https://github.com/amm1rr/simple-translate-plus/releases"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Version {extensionVersion}
             </a>
@@ -52,6 +68,7 @@ export default (props) => {
             <a
               href="https://github.com/sienori/simple-translate/blob/master/BACKERS.md"
               target="_blank"
+              rel="noopener noreferrer"
             >
               {browser.i18n.getMessage("backersLabel")}
             </a>
@@ -91,14 +108,14 @@ export default (props) => {
         type={"none"}
         extraCaption={
           <div>
-            <a href={patreonLink} target="_blank">
+            <a href={patreonLink} target="_blank" rel="noopener noreferrer">
               <img
                 src="/icons/patreonButton.png"
                 alt="Patreon"
                 style={{ height: 44, marginInlineEnd: 20 }}
               />
             </a>
-            <a href={paypalLink} target="_blank">
+            <a href={paypalLink} target="_blank" rel="noopener noreferrer">
               <img src="/icons/paypalButton.png" alt="Paypal" />
             </a>
           </div>
@@ -115,6 +132,7 @@ export default (props) => {
                 className="amazonUrl"
                 href={browser.i18n.getMessage("amazonUrl")}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 {browser.i18n.getMessage("amazonTitleLabel")}
               </a>
@@ -131,7 +149,8 @@ export default (props) => {
         extraCaption={
           <iframe
             src="https://simple-translate.sienori.com/sponsors.html"
-            style={{ height: sponsorsHeihgt, marginTop: 10 }}
+            style={{ height: sponsorsHeight, marginTop: 10 }}
+            title="Sponsors"
           />
         }
       />
@@ -144,11 +163,19 @@ export default (props) => {
           <div>
             <p>
               {browserInfo().name === "Chrome" ? (
-                <a href={chromeExtensionUrl} target="_blank">
+                <a
+                  href={chromeExtensionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {browser.i18n.getMessage("extensionPageLabel")}
                 </a>
               ) : (
-                <a href={firefoxAddonUrl} target="_blank">
+                <a
+                  href={firefoxAddonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {browser.i18n.getMessage("addonPageLabel")}
                 </a>
               )}
@@ -156,6 +183,7 @@ export default (props) => {
               <a
                 href="https://github.com/amm1rr/simple-translate-plus"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 GitHub
               </a>
@@ -163,6 +191,7 @@ export default (props) => {
               <a
                 href="https://simple-translate.sienori.com/privacy-policy"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 {browser.i18n.getMessage("privacyPolicyLabel")}
               </a>
@@ -183,10 +212,12 @@ const useAdditionalPermission = () => {
 
   const checkPermission = async () => {
     const hasPermission = await browser.permissions.contains(permissions);
+    log.debug(logDir, "Checking additional permissions", { hasPermission });
     setHasPermission(hasPermission);
   };
 
   const requestPermission = async () => {
+    log.debug(logDir, "Requesting additional permissions");
     await browser.permissions.request(permissions);
     checkPermission();
   };
@@ -197,3 +228,5 @@ const useAdditionalPermission = () => {
 
   return [hasPermission, requestPermission];
 };
+
+export default InformationPage;
