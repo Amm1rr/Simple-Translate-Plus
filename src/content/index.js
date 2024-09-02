@@ -1,3 +1,5 @@
+// src/content/index.js
+
 import React from "react";
 import ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
@@ -239,6 +241,13 @@ const handleMessage = async (request) => {
     case "disableExtension":
       removeTranslatecontainer();
       isEnabled = false;
+      break;
+    case "playAudio":
+      if (!isEnabled) return empty;
+      log.debug(logDir, "Received playAudio message, forwarding to background");
+      browser.runtime.sendMessage(request).catch((error) => {
+        log.error(logDir, "Error forwarding playAudio message:", error);
+      });
       break;
     default:
       return empty;

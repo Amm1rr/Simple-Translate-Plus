@@ -222,7 +222,6 @@ export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
   result.voiceLang = result.sourceLanguage;
 
   await updateVoiceLanguage(sourceWord, result.sourceLanguage);
-  await playPronunciationIfEnabled(sourceWord, result.voiceLang);
   setHistory(sourceWord, sourceLang, targetLang, translationApi, result);
   return result;
 };

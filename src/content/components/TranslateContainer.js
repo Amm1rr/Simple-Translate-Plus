@@ -1,3 +1,5 @@
+// src/content/components/TranslateContainer.js
+
 import React, { Component } from "react";
 import browser from "webextension-polyfill";
 import log from "loglevel";
@@ -161,6 +163,20 @@ export default class TranslateContainer extends Component {
       result.sourceLanguage.split("-")[0] === targetLang.split("-")[0] &&
       result.percentage > 0 &&
       targetLang !== secondLang;
+
+    if (getSettings("ifautoPlayListen")) {
+      log.debug(logDir, "Auto-playing audio for translated text");
+      browser.runtime
+        .sendMessage({
+          message: "playAudio",
+          text: this.selectedText,
+          sourceLang: result.sourceLanguage,
+          forcePlay: false,
+        })
+        .catch((error) => {
+          log.error(logDir, "Error sending playAudio message:", error);
+        });
+    }
 
     if (shouldSwitchSecondLang) {
       log.debug(logDir, "Switching to second language", { secondLang });

@@ -1,3 +1,5 @@
+// src/popup/components/PopupPage.js
+
 import React, { Component } from "react";
 import browser from "webextension-polyfill";
 import log from "loglevel";
@@ -9,7 +11,7 @@ import InputArea from "./InputArea";
 import ResultArea from "./ResultArea";
 import Footer from "./Footer";
 import "../styles/PopupPage.scss";
-import { getBackgroundColor } from "../../settings/defaultColors";
+// import { getBackgroundColor } from "../../settings/defaultColors";
 
 const logDir = "popup/PopupPage";
 
@@ -108,6 +110,20 @@ export default class PopupPage extends Component {
     this.inputTimer = setTimeout(async () => {
       const result = await this.translateText(inputText, this.state.targetLang);
       this.switchSecondLang(result);
+
+      if (getSettings("ifautoPlayListen")) {
+        log.debug(logDir, "Auto-playing audio for translated text");
+        browser.runtime
+          .sendMessage({
+            message: "playAudio",
+            text: inputText,
+            sourceLang: result.sourceLanguage,
+            forcePlay: false,
+          })
+          .catch((error) => {
+            log.error(logDir, "Error sending playAudio message:", error);
+          });
+      }
     }, waitTime);
   };
 

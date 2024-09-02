@@ -1,4 +1,5 @@
 // src/common/audioUtils.js
+
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
@@ -9,6 +10,8 @@ import {
 } from "./audioCache";
 
 const logDir = "common/audioUtils";
+
+let currentlyPlayingAudio = null;
 
 export const fetchAndPlayAudioFromGoogle = async (word, sourceLang) => {
   log.debug(logDir, "Fetching audio", { word, sourceLang });
@@ -38,53 +41,18 @@ export const fetchAndPlayAudioFromGoogle = async (word, sourceLang) => {
 
     log.debug(logDir, "Audio fetched successfully, caching and playing");
     await setAudioInCache(word, sourceLang, audioBlob);
-    playAudioFromCache(audioBlob); // Remove await here
+    currentlyPlayingAudio = await playAudioFromCache(audioBlob);
+    return currentlyPlayingAudio;
   } catch (error) {
     if (error.message.includes("status: 400")) {
-      console.info(
+      log.info(
+        logDir,
         "Received a 400 error. This might be due to an invalid request or unsupported language."
       );
     } else {
       log.error(logDir, "Error fetching or playing audio:", error);
     }
-  }
-};
-
-export const playPronunciationIfEnabled = async (word, sourceLang, listen) => {
-  log.debug(logDir, "playPronunciationIfEnabled called", {
-    word,
-    sourceLang,
-    listen,
-  });
-  let autoPlay;
-  if (listen === true) {
-    autoPlay = true;
-  } else if (listen === false) {
-    autoPlay = false;
-  } else {
-    autoPlay = getSettings("ifautoPlayListen");
-  }
-
-  if (word.split(" ").length > 2) {
-    autoPlay = false;
-  }
-
-  if (autoPlay === true) {
-    if (sourceLang === "auto") {
-      sourceLang = "en";
-    }
-
-    const cachedAudio = await getAudioFromCache(word, sourceLang);
-
-    if (cachedAudio) {
-      log.debug(logDir, "Playing cached audio");
-      await playAudioFromCache(cachedAudio);
-    } else {
-      log.debug(logDir, "No cached audio found, fetching and playing");
-      await fetchAndPlayAudioFromGoogle(word, sourceLang);
-    }
-  } else {
-    log.debug(logDir, "Autoplay is disabled, skipping audio playback");
+    throw error;
   }
 };
 
@@ -101,20 +69,41 @@ export const playAudioWithCaching = async (
   try {
     sourceLang = sourceLang === "auto" ? "en" : sourceLang;
 
+    if (currentlyPlayingAudio) {
+      log.debug(logDir, "Stopping currently playing audio");
+      currentlyPlayingAudio.pause();
+      currentlyPlayingAudio = null;
+    }
+
     const cachedAudio = await getAudioFromCache(text, sourceLang);
     if (cachedAudio) {
       log.debug(logDir, "Using cached audio");
-      return playAudioFromCache(cachedAudio);
+      currentlyPlayingAudio = await playAudioFromCache(cachedAudio);
+      return currentlyPlayingAudio;
     }
 
-    if (!forcePlay) {
-      log.debug(logDir, "Not forced to play, skipping fetch");
-      return;
+    if (!forcePlay && !getSettings("ifautoPlayListen")) {
+      log.debug(
+        logDir,
+        "Not forced to play and autoplay is disabled, skipping fetch"
+      );
+      return null;
     }
 
     log.debug(logDir, "Fetching audio");
-    await fetchAndPlayAudioFromGoogle(text, sourceLang);
+    currentlyPlayingAudio = await fetchAndPlayAudioFromGoogle(text, sourceLang);
+    return currentlyPlayingAudio;
   } catch (error) {
     log.error(logDir, "playAudioWithCaching error:", error);
+    return null;
+  }
+};
+
+// This function can be used to stop any currently playing audio
+export const stopCurrentlyPlayingAudio = () => {
+  if (currentlyPlayingAudio) {
+    currentlyPlayingAudio.pause();
+    currentlyPlayingAudio = null;
+    log.debug(logDir, "Stopped currently playing audio");
   }
 };

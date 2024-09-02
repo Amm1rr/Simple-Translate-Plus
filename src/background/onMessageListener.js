@@ -1,8 +1,13 @@
+// src/background/onMessageListener.js
+
+import browser from "webextension-polyfill";
+import log from "loglevel";
 import { initSettings } from "src/settings/settings";
 import translate from "src/common/translate";
-import log from "loglevel";
-import browser from "webextension-polyfill";
-import { fetchAndPlayAudioFromGoogle } from "../common/audioUtils";
+import {
+  playAudioWithCaching,
+  stopCurrentlyPlayingAudio,
+} from "../common/audioUtils";
 
 const logDir = "background/onMessageListener";
 
@@ -32,20 +37,29 @@ export default async (data, sender, sendResponse) => {
           };
         }
       }
-      case "listen": {
+      case "playAudio": {
         log.debug(
           logDir,
-          "Listening to:",
+          "Playing audio:",
           data.text,
           "in language:",
           data.sourceLang,
           "forcePlay:",
           data.forcePlay
         );
-        fetchAndPlayAudioFromGoogle(data.text, data.sourceLang, data.forcePlay);
-        sendResponse({ success: true });
-        log.debug(logDir, "Listen response sent");
-        return false; // Don't keep the message channel open
+        try {
+          stopCurrentlyPlayingAudio(); // Stop any currently playing audio
+          const audio = await playAudioWithCaching(
+            data.text,
+            data.sourceLang,
+            data.forcePlay
+          );
+          sendResponse({ success: !!audio });
+        } catch (error) {
+          log.error(logDir, "Error playing audio:", error);
+          sendResponse({ success: false, error: error.message });
+        }
+        return true; // Keep the message channel open for the asynchronous response
       }
       case "VoiceLanguage": {
         log.debug(
@@ -70,12 +84,11 @@ export default async (data, sender, sendResponse) => {
           log.error(logDir, "Sender tab not found");
         }
         sendResponse({ success: true });
-        log.debug(logDir, "VoiceLanguage response sent");
         return true;
       }
       default:
         log.debug(logDir, "Unhandled message type:", data.message);
-        sendResponse({ success: true });
+        sendResponse({ success: false, error: "Unhandled message type" });
         return true;
     }
   } catch (error) {
