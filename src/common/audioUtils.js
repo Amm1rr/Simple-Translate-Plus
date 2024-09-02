@@ -1,6 +1,5 @@
 // src/common/audioUtils.js
 
-import browser from "webextension-polyfill";
 import log from "loglevel";
 import { getSettings } from "src/settings/settings";
 import {

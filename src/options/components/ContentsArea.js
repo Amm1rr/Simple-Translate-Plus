@@ -3,11 +3,11 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import browserInfo from "browser-info";
+import log from "loglevel";
 import SettingsPage from "./SettingsPage";
 import KeyboardShortcutsPage from "./KeyboardShortcutsPage";
 import InformationPage from "./InformationPage";
 import "../styles/ContentsArea.scss";
-import log from "loglevel";
 
 const logDir = "options/ContentsArea";
 

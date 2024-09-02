@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
+import log from "loglevel";
 import { updateLogLevel, overWriteLogLevel } from "src/common/log";
 import {
   initSettings,
@@ -11,7 +12,6 @@ import {
 } from "src/settings/settings";
 import defaultSettings from "src/settings/defaultSettings";
 import CategoryContainer from "./CategoryContainer";
-import log from "loglevel";
 
 const logDir = "options/SettingsPage";
 

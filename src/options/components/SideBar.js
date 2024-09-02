@@ -1,9 +1,9 @@
 import React from "react";
 import browser from "webextension-polyfill";
+import log from "loglevel";
 import { Link, useLocation } from "react-router-dom";
 import browserInfo from "browser-info";
 import "../styles/SideBar.scss";
-import log from "loglevel";
 
 const logDir = "options/SideBar";
 
