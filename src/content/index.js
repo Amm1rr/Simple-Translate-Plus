@@ -309,10 +309,11 @@ const showTranslateContainer = (
 
   const themeClass = "simple-translate-" + getSettings("theme") + "-theme";
 
-  document.body.insertAdjacentHTML(
-    "beforeend",
-    `<div id="simple-translate-plus" class="${themeClass}"></div>`
-  );
+  const container = document.createElement("div");
+  container.id = "simple-translate-plus";
+  container.className = themeClass;
+  document.body.appendChild(container);
+
   ReactDOM.render(
     <TranslateContainer
       removeContainer={removeTranslatecontainer}
