@@ -1,5 +1,5 @@
 {
-  "name": "simple-translate",
+  "name": "simple-translate-plus",
   "version": "0.0.0",
   "dependencies": {
     "browser-info": "^1.2.0",
