@@ -1,3 +1,4 @@
+// src/popup/components/ListenButton.js
 import React, { Component } from "react";
 import browser from "webextension-polyfill";
 import log from "loglevel";
@@ -11,10 +12,7 @@ export default class ListenButton extends Component {
     super(props);
     this.state = {
       voiceLang: props.initialVoiceLang || "en",
-      audioCache: new Map(),
     };
-    this.audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
     log.debug(logDir, "Constructor called", props);
   }
 
@@ -66,17 +64,16 @@ export default class ListenButton extends Component {
       return;
     }
 
-    log.debug(logDir, "Sending listen message");
+    log.debug(logDir, "Sending playAudio message");
     browser.runtime
       .sendMessage({
-        action: "listen",
-        message: "listen",
+        message: "playAudio",
         text: text,
         sourceLang: voiceLang,
         forcePlay: true,
       })
       .catch((error) => {
-        log.error(logDir, "Error sending listen message", error);
+        log.error(logDir, "Error sending playAudio message:", error);
       });
   };
 

@@ -1,3 +1,5 @@
+// src/background/background.js
+
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import { initSettings, handleSettingsChange } from "src/settings/settings";
