@@ -9,7 +9,7 @@
       "id": "simple-translate-plus@amm1rr"
     }
   },
-  "permissions": ["storage", "contextMenus", "tabs"],
+  "permissions": ["storage", "contextMenus", "tabs", "webNavigation"],
   "host_permissions": ["http://localhost:3000/"],
   "options_ui": {
     "page": "options/index.html",

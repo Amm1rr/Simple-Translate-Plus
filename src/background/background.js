@@ -31,10 +31,10 @@ browser.contextMenus.onClicked.addListener(onMenusClickedListener);
 // Set-Cookie > SameSite=Strict|Lax|None
 if (browser.webNavigation) {
   browser.webNavigation.onCompleted.addListener(function (details) {
-    browser.tabs.executeScript({
+    browser.tabs.executeScript(details.tabId, {
       code: `
-        document.head.insertAdjacentHTML('beforeend', '<meta http-equiv="Set-Cookie" content="SameSite=None;Secure">');
-      `,
+          document.cookie = "cookieName=cookieValue; SameSite=None; Secure; path=/;";
+          `,
     });
   });
 }
