@@ -99,6 +99,46 @@ const defaultSettings = [
           },
           {
             id: "translationApi",
+            title: "openaiApiLabel",
+            captions: ["openaiApiCaptionLabel"],
+            type: "radio",
+            value: "openai",
+            handleChange: () => updateLangsWhenChangeTranslationApi(),
+            extraCaption: React.createElement(
+              "p",
+              { className: "caption" },
+              React.createElement(
+                "a",
+                {
+                  href: "https://platform.openai.com/",
+                  target: "_blank",
+                },
+                browser.i18n.getMessage("registerOpenAILabel")
+              )
+            ),
+          },
+          {
+            id: "openaiAuthKey",
+            title: "openaiAuthKeyLabel",
+            captions: ["openaiAuthKeyCaptionLabel"],
+            type: "text",
+            default: "",
+            placeholder: "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            shouldShow: () => getSettings("translationApi") === "openai",
+          },
+          {
+            id: "openaiPrompt",
+            title: "openaiPromptLabel",
+            captions: ["openaiPromptCaptionLabel"],
+            type: "textarea",
+            default: "",
+            placeholder: browser.i18n.getMessage(
+              "defaultOpenaiPromptPlaceholder"
+            ),
+            shouldShow: () => getSettings("translationApi") === "openai",
+          },
+          {
+            id: "translationApi",
             title: "deeplApiLabel",
             captions: ["deeplApiCaptionLabel"],
             extraCaption: React.createElement(

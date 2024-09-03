@@ -165,6 +165,70 @@ const sendRequestToDeepL = async (word, sourceLang, targetLang) => {
   return resultData;
 };
 
+const sendRequestToOpenAI = async (word, sourceLang, targetLang) => {
+  const apiKey = getSettings("openaiAuthKey");
+  const customPrompt =
+    getSettings("openaiPrompt") ||
+    browser.i18n.getMessage("openaiDefaultPrompt");
+
+  const prompt = customPrompt
+    .replace("{sourceLang}", sourceLang)
+    .replace("{targetLang}", targetLang)
+    .replace("{text}", word);
+
+  const url = "https://api.openai.com/v1/chat/completions";
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that translates text.",
+        },
+        { role: "user", content: prompt },
+      ],
+    }),
+  }).catch((e) => ({ status: 0, statusText: "" }));
+
+  const resultData = {
+    resultText: "",
+    candidateText: "",
+    sourceLanguage: sourceLang,
+    percentage: 1,
+    isError: false,
+    errorMessage: "",
+  };
+
+  if (response.status !== 200) {
+    resultData.isError = true;
+
+    if (response.status === 0)
+      resultData.errorMessage = browser.i18n.getMessage("networkError");
+    else if (response.status === 401)
+      resultData.errorMessage = browser.i18n.getMessage("openaiAuthError");
+    else
+      resultData.errorMessage = `${browser.i18n.getMessage("unknownError")} [${
+        response.status
+      } ${response.statusText}]`;
+
+    log.error(logDir, "sendRequestToOpenAI()", response);
+    return resultData;
+  }
+
+  const result = await response.json();
+
+  resultData.resultText = result.choices[0].message.content.trim();
+
+  log.log(logDir, "sendRequestToOpenAI()", resultData);
+  return resultData;
+};
+
 const updateVoiceLanguage = async (word, sourceLang) => {
   log.debug(logDir, "Updating Voice Language:", sourceLang);
 
@@ -210,10 +274,25 @@ export default async (sourceWord, sourceLang = "auto", targetLang, listen) => {
     return cachedResult;
   }
 
-  const result =
-    translationApi === "google"
-      ? await sendRequestToGoogle(sourceWord, sourceLang, targetLang, listen)
-      : await sendRequestToDeepL(sourceWord, sourceLang, targetLang);
+  let result;
+  switch (translationApi) {
+    case "google":
+      result = await sendRequestToGoogle(
+        sourceWord,
+        sourceLang,
+        targetLang,
+        listen
+      );
+      break;
+    case "deepl":
+      result = await sendRequestToDeepL(sourceWord, sourceLang, targetLang);
+      break;
+    case "openai":
+      result = await sendRequestToOpenAI(sourceWord, sourceLang, targetLang);
+      break;
+    default:
+      throw new Error("Unknown translation API");
+  }
 
   result.voiceLang = result.sourceLanguage;
 

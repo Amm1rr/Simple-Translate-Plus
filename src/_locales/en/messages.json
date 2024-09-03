@@ -62,6 +62,36 @@
   "googleApiCaptionLabel": {
     "message": "Use Google Translate API. No registration is required."
   },
+  "openaiApiLabel": {
+    "message": "OpenAI API"
+  },
+  "openaiApiCaptionLabel": {
+    "message": "Use OpenAI API. API Key is required."
+  },
+  "registerOpenAILabel": {
+    "message": "Get OpenAI API key."
+  },
+  "openaiAuthKeyLabel": {
+    "message": "OpenAI API Key"
+  },
+  "openaiAuthKeyCaptionLabel": {
+    "message": "Enter your OpenAI API key."
+  },
+  "openaiPromptLabel": {
+    "message": "OpenAI Custom Prompt"
+  },
+  "openaiPromptCaptionLabel": {
+    "message": "Custom prompt for OpenAI translations (optional). \nUse placeholders: {text}, {sourceLang}, {targetLang}."
+  },
+  "openaiDefaultPrompt": {
+    "message": "Act as a translator; Translate and show a few small helpful details as a dictionary. Without any explaition just doing, Translate the following text to {targetLang}:\n\n{text}"
+  },
+  "defaultOpenaiPromptPlaceholder": {
+    "message": "Example: 'Translate {sourceLang} to {targetLang}, keeping tone: {text}'"
+  },
+  "openaiAuthError": {
+    "message": "Error: Authentication of OpenAI API failed. Please check your API key in the settings."
+  },
   "deeplApiLabel": {
     "message": "DeepL API"
   },
