@@ -6,19 +6,19 @@ import { getSettings } from "src/settings/settings";
 const logDir = "background/menus";
 
 export const showMenus = () => {
-  log.info(logDir, "Checking if menu should be shown...");
+  log.debug(logDir, "Checking if menu should be shown...");
   if (getSettings("ifShowMenu")) {
     removeMenus();
     createMenus();
-    log.info(logDir, "Menus created successfully.");
+    log.debug(logDir, "Menus created successfully.");
   } else {
     removeMenus();
-    log.info(logDir, "Menus removed as per settings.");
+    log.debug(logDir, "Menus removed as per settings.");
   }
 };
 
 export const onMenusShownListener = (info, tab) => {
-  log.info(
+  log.debug(
     `${logDir}: onMenusShownListener called with context:`,
     info.contexts
   );
@@ -35,7 +35,7 @@ export const onMenusShownListener = (info, tab) => {
 };
 
 export const onMenusClickedListener = (info, tab) => {
-  log.info(
+  log.debug(
     `${logDir}: onMenusClickedListener called with menuItemId:`,
     info.menuItemId
   );
@@ -94,7 +94,7 @@ function removeMenus() {
 }
 
 function translateText(tab) {
-  log.info(
+  log.debug(
     `${logDir}: Requesting translation for selected text in tab:`,
     tab.id
   );
