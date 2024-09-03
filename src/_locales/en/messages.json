@@ -81,7 +81,7 @@
     "message": "OpenAI Custom Prompt"
   },
   "openaiPromptCaptionLabel": {
-    "message": "Custom prompt for OpenAI translations (optional). \nUse placeholders: {text}, {sourceLang}, {targetLang}."
+    "message": "Custom prompt for OpenAI translations (optional). \n\nUse placeholders: \n- {text} \n- {sourceLang} \n- {targetLang}\n\n"
   },
   "openaiDefaultPrompt": {
     "message": "Act as a translator and dictionary; translate the following text into {targetLang}, providing a few key details or nuances without explanation. Simply translate and include these brief insights: \n\n{text}"
