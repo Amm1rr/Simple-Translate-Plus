@@ -84,10 +84,10 @@
     "message": "Custom prompt for OpenAI translations (optional). \nUse placeholders: {text}, {sourceLang}, {targetLang}."
   },
   "openaiDefaultPrompt": {
-    "message": "Act as a translator; Translate and show a few small helpful details as a dictionary. Without any explaition just doing, Translate the following text to {targetLang}:\n\n{text}"
+    "message": "Act as a translator and dictionary; translate the following text into {targetLang}, providing a few key details or nuances without explanation. Simply translate and include these brief insights: \n\n{text}"
   },
   "defaultOpenaiPromptPlaceholder": {
-    "message": "Example: 'Translate {sourceLang} to {targetLang}, keeping tone: {text}'"
+    "message": "Act as a translator and dictionary; translate the following text into {targetLang}, providing a few key details or nuances without explanation. Simply translate and include these brief insights: \n\n{text}"
   },
   "openaiAuthError": {
     "message": "Error: Authentication of OpenAI API failed. Please check your API key in the settings."
