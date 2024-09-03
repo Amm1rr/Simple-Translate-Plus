@@ -20,7 +20,7 @@ const getDefaultLangs = () => {
 
   const shouldUseUiLang = langOptions.some((lang) => lang.value === uiLang);
   const targetLang = shouldUseUiLang ? uiLang : "en";
-  const secondTargetLang = targetLang === "en" ? "ja" : "en";
+  const secondTargetLang = targetLang === "en" ? "fa" : "en";
 
   log.debug(logDir, "Default languages determined", {
     uiLang,
