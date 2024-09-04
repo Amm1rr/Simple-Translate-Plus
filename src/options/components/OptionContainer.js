@@ -4,17 +4,18 @@ import { setSettings } from "src/settings/settings";
 import KeyboardShortcutForm from "./KeyboardShortcutForm";
 import "../styles/OptionContainer.scss";
 
-export default props => {
+export default (props) => {
   const { title, captions, type, id, children, currentValue } = props;
 
-  const handleValueChange = e => {
+  const handleValueChange = (e) => {
     let value = e.target.value;
 
     if (type == "number") {
       const validity = e.target.validity;
       if (validity.rangeOverflow) value = props.max;
       else if (validity.rangeUnderflow) value = props.min;
-      else if (validity.badInput || value == "" || !validity.valid) value = props.default;
+      else if (validity.badInput || value == "" || !validity.valid)
+        value = props.default;
     }
 
     setSettings(id, value);
@@ -22,7 +23,7 @@ export default props => {
     if (props.handleChange) props.handleChange();
   };
 
-  const handleCheckedChange = e => {
+  const handleCheckedChange = (e) => {
     setSettings(id, e.target.checked);
   };
 
@@ -92,7 +93,7 @@ export default props => {
             name={id}
             value={props.value}
             onChange={handleValueChange}
-            defaultChecked={props.value === currentValue ? "checked" : ""}
+            checked={props.value === currentValue ? "checked" : ""}
           />
           <span className="radio" />
         </label>
@@ -116,9 +117,14 @@ export default props => {
       optionForm = (
         <div className="selectWrap">
           <select id={formId} onChange={handleValueChange} value={currentValue}>
-            {(typeof props.options === 'function' ? props.options() : props.options).map((option, index) => (
+            {(typeof props.options === "function"
+              ? props.options()
+              : props.options
+            ).map((option, index) => (
               <option value={option.value} key={index}>
-                {props.useRawOptionName ? option.name : browser.i18n.getMessage(option.name)}
+                {props.useRawOptionName
+                  ? option.name
+                  : browser.i18n.getMessage(option.name)}
               </option>
             ))}
           </select>
@@ -128,7 +134,11 @@ export default props => {
     case "button":
       formId = "";
       optionForm = (
-        <input type="button" value={browser.i18n.getMessage(props.value)} onClick={props.onClick} />
+        <input
+          type="button"
+          value={browser.i18n.getMessage(props.value)}
+          onClick={props.onClick}
+        />
       );
       break;
     case "file":
@@ -149,7 +159,11 @@ export default props => {
     case "keyboard-shortcut":
       formId = id;
       optionForm = (
-        <KeyboardShortcutForm id={id} shortcut={props.shortcut} defaultValue={props.defaultValue} />
+        <KeyboardShortcutForm
+          id={id}
+          shortcut={props.shortcut}
+          defaultValue={props.defaultValue}
+        />
       );
       break;
     case "none":
@@ -158,17 +172,32 @@ export default props => {
       break;
   }
 
-  const shouldShow = props.shouldShow == undefined
-    || (typeof props.shouldShow === 'function' ? props.shouldShow() : props.shouldShow);
+  const shouldShow =
+    props.shouldShow == undefined ||
+    (typeof props.shouldShow === "function"
+      ? props.shouldShow()
+      : props.shouldShow);
 
   return (
     shouldShow && (
-      <li className={`optionContainer ${props.updated ? "updated" : ""} ${props.new ? "new" : ""}`}>
+      <li
+        className={`optionContainer ${props.updated ? "updated" : ""} ${
+          props.new ? "new" : ""
+        }`}
+      >
         {props.hr && <hr />}
-        <div className={`optionElement ${type == "textarea" ? "showColumn" : ""}`}>
+        <div
+          className={`optionElement ${type == "textarea" ? "showColumn" : ""}`}
+        >
           <div className="optionText">
             <label className="noHover" htmlFor={formId ? formId : null}>
-              <p>{title ? (props.useRawTitle ? title : browser.i18n.getMessage(title)) : ""}</p>
+              <p>
+                {title
+                  ? props.useRawTitle
+                    ? title
+                    : browser.i18n.getMessage(title)
+                  : ""}
+              </p>
             </label>
             {captions.map((caption, index) => (
               <p className="caption" key={index}>
@@ -186,7 +215,11 @@ export default props => {
         {children && (
           <fieldset>
             <legend className="noDisplayLegend">
-              {title ? (props.useRawTitle ? title : browser.i18n.getMessage(title)) : ""}
+              {title
+                ? props.useRawTitle
+                  ? title
+                  : browser.i18n.getMessage(title)
+                : ""}
             </legend>
             {children}
           </fieldset>
