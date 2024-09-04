@@ -3,13 +3,18 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import browser from "webextension-polyfill";
 import { HashRouter, Routes, Route } from "react-router-dom";
-import { initSettings, getSettings } from "../../settings/settings";
+import log from "loglevel";
+import {
+  initSettings,
+  getSettings,
+  subscribeToSettingsChanges,
+} from "../../settings/settings";
 import SideBar from "./SideBar";
 import ContentsArea from "./ContentsArea";
 import ScrollToTop from "./ScrollToTop";
 import "../styles/OptionsPage.scss";
 
-const AUDIO_CACHE_KEY = "SimpleTranslatePlusAudioCache";
+const logDir = "options/OptionsPage";
 
 const OptionsPage = () => {
   const optionsPageClassName = useMemo(() => {
@@ -18,25 +23,10 @@ const OptionsPage = () => {
     return "optionsPage" + (rtlLanguage ? " rtl-language" : "");
   }, []);
 
-  const handleStorageChange = useCallback((changes) => {
-    // Ignore changes to the audio cache
-    if (AUDIO_CACHE_KEY in changes) return;
-
-    if (
-      changes.Settings &&
-      changes.Settings.newValue &&
-      changes.Settings.oldValue
-    ) {
-      const newTheme = changes.Settings.newValue.theme;
-      const oldTheme = changes.Settings.oldValue.theme;
-
-      if (newTheme && oldTheme && newTheme !== oldTheme) {
-        document.body.classList.replace(
-          `${oldTheme}-theme`,
-          `${newTheme}-theme`
-        );
-      }
-    }
+  const handleSettingsChange = useCallback((newSettings) => {
+    log.debug(logDir, "Settings changed:", newSettings);
+    const newTheme = newSettings.theme;
+    document.body.className = `${newTheme}-theme`;
   }, []);
 
   useEffect(() => {
@@ -45,16 +35,12 @@ const OptionsPage = () => {
       const theme = getSettings("theme");
       document.body.classList.add(`${theme}-theme`);
 
-      browser.storage.local.onChanged.addListener(handleStorageChange);
+      const unsubscribe = subscribeToSettingsChanges(handleSettingsChange);
+      return unsubscribe;
     };
 
     setupTheme();
-
-    // Clean up function
-    return () => {
-      browser.storage.local.onChanged.removeListener(handleStorageChange);
-    };
-  }, [handleStorageChange]);
+  }, [handleSettingsChange]);
 
   return (
     <HashRouter>

@@ -15,19 +15,6 @@ import onMessageListener from "./onMessageListener";
 
 const logDir = "background/background";
 
-browser.runtime.onInstalled.addListener(onInstalledListener);
-browser.commands.onCommand.addListener(onCommandListener);
-browser.runtime.onMessage.addListener(onMessageListener);
-browser.storage.local.onChanged.addListener((changes) => {
-  handleSettingsChange(changes);
-  updateLogLevel();
-  showMenus();
-});
-
-if (!!browser.contextMenus?.onShown)
-  browser.contextMenus.onShown.addListener(onMenusShownListener);
-browser.contextMenus.onClicked.addListener(onMenusClickedListener);
-
 const init = async () => {
   try {
     await Promise.all([initSettings(), overWriteLogLevel(), updateLogLevel()]);
@@ -37,5 +24,22 @@ const init = async () => {
     log.error(logDir, "Initialization failed:", error);
   }
 };
+
+browser.runtime.onInstalled.addListener(onInstalledListener);
+browser.commands.onCommand.addListener(onCommandListener);
+browser.runtime.onMessage.addListener(onMessageListener);
+browser.storage.local.onChanged.addListener((changes) => {
+  const newSettings = handleSettingsChange(changes);
+  if (newSettings) {
+    log.debug(logDir, "Settings changed:", newSettings);
+    updateLogLevel();
+    showMenus();
+  }
+});
+
+if (browser.contextMenus?.onShown) {
+  browser.contextMenus.onShown.addListener(onMenusShownListener);
+}
+browser.contextMenus.onClicked.addListener(onMenusClickedListener);
 
 init();

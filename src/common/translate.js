@@ -5,7 +5,7 @@ import { getSettings } from "src/settings/settings";
 const logDir = "common/translate";
 
 const getCacheKey = (sourceWord, sourceLang, targetLang, translationApi) => {
-  return `${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`;
+  return `stplus-${sourceLang}-${targetLang}-${translationApi}-${sourceWord}`;
 };
 
 const getHistory = async (
@@ -20,7 +20,7 @@ const getHistory = async (
     targetLang,
     translationApi
   );
-  const result = await browser.storage.session.get(cacheKey);
+  const result = await browser.storage.local.get(cacheKey);
   const cachedResult = result[cacheKey] || false;
   log.debug(
     logDir,
@@ -46,7 +46,7 @@ const setHistory = async (
     targetLang,
     translationApi
   );
-  await browser.storage.session.set({ [cacheKey]: result });
+  await browser.storage.local.set({ [cacheKey]: result });
   log.debug(logDir, "Set cache for key:", cacheKey);
 };
 

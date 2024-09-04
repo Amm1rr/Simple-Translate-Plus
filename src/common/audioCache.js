@@ -1,4 +1,5 @@
 // src/common/audioCache.js
+
 import browser from "webextension-polyfill";
 import log from "loglevel";
 

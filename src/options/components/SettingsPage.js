@@ -8,7 +8,7 @@ import {
   resetAllSettings,
   exportSettings,
   importSettings,
-  handleSettingsChange,
+  subscribeToSettingsChanges,
 } from "src/settings/settings";
 import defaultSettings from "src/settings/defaultSettings";
 import CategoryContainer from "./CategoryContainer";
@@ -26,45 +26,44 @@ const SettingsPage = () => {
       overWriteLogLevel();
       updateLogLevel();
       setIsInit(true);
-      setCurrentValues(getAllSettings());
+      const allSettings = getAllSettings();
+      setCurrentValues(allSettings);
+      log.debug(logDir, "Initial settings:", allSettings);
 
-      browser.storage.local.onChanged.addListener((changes) => {
-        log.debug(logDir, "Settings changed", changes);
-        const newSettings = handleSettingsChange(changes);
-        if (newSettings) setCurrentValues(newSettings);
+      const unsubscribe = subscribeToSettingsChanges((newSettings) => {
+        log.debug(logDir, "Settings changed:", newSettings);
+        setCurrentValues(newSettings);
       });
+
+      return unsubscribe;
     };
 
     init();
-
-    return () => {
-      browser.storage.local.onChanged.removeListener(handleSettingsChange);
-    };
   }, []);
 
   log.debug(logDir, "Rendering SettingsPage", { isInit, currentValues });
 
-  const settingsContent = (
-    <ul>
-      {defaultSettings.map((category, index) => (
-        <CategoryContainer
-          {...category}
-          key={index}
-          currentValues={currentValues}
-        />
-      ))}
-      <CategoryContainer
-        {...additionalCategory}
-        currentValues={currentValues}
-      />
-    </ul>
-  );
+  if (!isInit) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
       <p className="contentTitle">{browser.i18n.getMessage("settingsLabel")}</p>
       <hr />
-      {isInit ? settingsContent : "Loading..."}
+      <ul>
+        {defaultSettings.map((category, index) => (
+          <CategoryContainer
+            {...category}
+            key={index}
+            currentValues={currentValues}
+          />
+        ))}
+        <CategoryContainer
+          {...additionalCategory}
+          currentValues={currentValues}
+        />
+      </ul>
     </div>
   );
 };

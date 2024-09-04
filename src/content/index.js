@@ -7,7 +7,7 @@ import log from "loglevel";
 import {
   initSettings,
   getSettings,
-  handleSettingsChange,
+  subscribeToSettingsChanges,
 } from "src/settings/settings";
 import { updateLogLevel, overWriteLogLevel } from "src/common/log";
 import TranslateContainer from "./components/TranslateContainer";
@@ -23,7 +23,11 @@ const init = async () => {
   document.addEventListener("mouseup", handleMouseUp);
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("visibilitychange", handleVisibilityChange);
-  browser.storage.local.onChanged.addListener(handleSettingsChange);
+  subscribeToSettingsChanges((newSettings) => {
+    log.debug(logDir, "Settings changed:", newSettings);
+    updateLogLevel();
+    disableExtensionByUrlList();
+  });
   browser.runtime.onMessage.addListener(handleMessage);
   overWriteLogLevel();
   updateLogLevel();

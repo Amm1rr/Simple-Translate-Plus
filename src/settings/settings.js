@@ -1,3 +1,5 @@
+// src/settings/settings.js
+
 import browser from "webextension-polyfill";
 import log from "loglevel";
 import defaultSettings from "./defaultSettings";
@@ -32,14 +34,19 @@ export const initSettings = async () => {
   };
 
   fetchDefaultSettings();
-  if (shouldSave)
+  if (shouldSave) {
     await browser.storage.local.set({ Settings: currentSettings });
+    log.debug(logDir, "Initialized settings:", currentSettings);
+  } else {
+    log.debug(logDir, "Settings already initialized:", currentSettings);
+  }
 };
 
 export const setSettings = async (id, value) => {
   log.info(logDir, "setSettings()", id, value);
   currentSettings[id] = value;
   await browser.storage.local.set({ Settings: currentSettings });
+  notifySettingsChange();
 };
 
 export const getSettings = (id) => {
@@ -55,15 +62,41 @@ export const resetAllSettings = async () => {
   currentSettings = {};
   await browser.storage.local.set({ Settings: currentSettings });
   await initSettings();
+  notifySettingsChange();
 };
 
 export const handleSettingsChange = (changes) => {
-  if (Object.keys(changes).includes("Settings")) {
-    currentSettings = changes.Settings.newValue;
+  if (changes.Settings) {
+    currentSettings = changes.Settings.newValue || {};
+    log.debug(logDir, "Settings updated:", currentSettings);
     return currentSettings;
   }
   return null;
 };
+
+let settingsChangeListeners = [];
+
+export const subscribeToSettingsChanges = (listener) => {
+  settingsChangeListeners.push(listener);
+  return () => {
+    settingsChangeListeners = settingsChangeListeners.filter(
+      (l) => l !== listener
+    );
+  };
+};
+
+const notifySettingsChange = () => {
+  settingsChangeListeners.forEach((listener) => listener(currentSettings));
+};
+
+browser.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "local" && changes.Settings) {
+    const newSettings = handleSettingsChange(changes);
+    if (newSettings) {
+      notifySettingsChange();
+    }
+  }
+});
 
 export const exportSettings = async () => {
   const settingsIds = getSettingsIds();
