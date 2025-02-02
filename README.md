@@ -63,7 +63,7 @@ Prerequisites:
 Setup:
 
 1. Clone the repository: `git clone https://github.com/amm1rr/simple-translate-plus`
-2. Install dependencies: `npm install`
+2. Install dependencies: `npm install` or `pnpm install` if you have no npm installed
 3. Start development watch: `npm run watch-dev`
 
 ### Loading the Extension
