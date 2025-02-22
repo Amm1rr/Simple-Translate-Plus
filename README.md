@@ -91,7 +91,3 @@ Setup:
 ## Privacy
 
 Read our [Privacy Policy](https://simple-translate.sienori.com/privacy-policy) to understand how we handle your data.
-
----
-
-This improved README provides a clearer structure, highlights key features more effectively, and offers a more comprehensive guide for both users and potential contributors. It also emphasizes the new features of Simple Translate Plus and provides clear instructions for development and installation across different browsers.
