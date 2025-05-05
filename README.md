@@ -1,12 +1,24 @@
+<br>
+
+> ⚠️ **Notice**  
+> As of **May 5, 2025**, this project is no longer maintained.  
+> Please refer to our new project **[Translate It!](https://github.com/iSegaro/Translate-It)** as the recommended alternative.
+
+<br>
+
+---
+
+<br>
+
 # <sub><img src="./src/icons/64.png" width=64px height=64px></sub> Simple Translate Plus
 
 #### Instantly translate selected or typed text on web pages. Supports Google Translate and DeepL API.
 
-[<img src="other/promotion/badges/firefox.png" align="left" alt="Simple Translate Plus for Firefox (soon...)"  height="60px">](https://addons.mozilla.org/firefox/addon/simple-translate/)
+[<img src="other/promotion/badges/firefox.png" align="left" alt="Simple Translate Plus for Firefox (soon...)"  height="60px">](https://github.com/iSegaro/Translate-It)
 
-[<img src="other/promotion/badges/chrome.png" alt="Simple Translate Plus for Chrome (soon...)" height="60px">](https://chrome.google.com/webstore/detail/simple-translate-plus/)
+[<img src="other/promotion/badges/chrome.png" alt="Simple Translate Plus for Chrome (soon...)" height="60px">](https://github.com/iSegaro/Translate-It)
 
-[<img src="other/promotion/badges/edge.png" alt="Simple Translate Plus for Microsoft Edge (soon...)" height="40px">](https://microsoftedge.microsoft.com/addons/detail/)
+[<img src="other/promotion/badges/edge.png" alt="Simple Translate Plus for Microsoft Edge (soon...)" height="40px">](https://github.com/iSegaro/Translate-It)
 
 ## About
 
@@ -41,12 +53,6 @@ Simple Translate Plus enhances your browsing experience with seamless translatio
 - Firefox Add-ons (Coming Soon)
 - Chrome Web Store (Coming Soon)
 - Microsoft Edge Add-ons (Coming Soon)
-
-## Support the Project
-
-Your support helps maintain and improve Simple Translate Plus:
-
-[<img src="other/promotion/badges/patreon.png" alt="Become a Patron" height="44px" align="left">](https://patreon.com/Simple_Translate_Plus)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="other/promotion/badges/paypal.png" alt="Donate with PayPal">](https://www.paypal.com/donate/?hosted_button_id=TKAXW2BR35PAA)
 
 ## Contribute
 
